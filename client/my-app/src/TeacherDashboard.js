@@ -48,7 +48,7 @@ function TeacherDashboard() {
             <span role="img" aria-label="teacher">🧑‍🏫</span>
           </div>
           <div>
-            <div>Prof. Smith</div>
+            <div>Prof. Swapnil P</div>
             <div className="parent-user-role" style={{color:'#22c55e'}}>Teacher</div>
           </div>
         </div>
