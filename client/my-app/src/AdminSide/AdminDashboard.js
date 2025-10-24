@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './AdminDashboard.css';
 import ReportAdmin from './ReportAdmin';
 import StudentAdmin from './StudentAdmin';
+import Teachers from './TeacherAdmin';
+import FeeManagement from './FeeManagement';
 
 function AdminDashboard({ onSignOut }) {
   const [activeSection, setActiveSection] = useState('students');
@@ -124,10 +126,18 @@ function AdminDashboard({ onSignOut }) {
           >
             <span role="img" aria-label="students">🧑‍🎓</span> Students
           </button>
-          <button onClick={() => {}} aria-label="Teachers">
+          <button 
+            className={activeSection === 'teachers' ? 'active' : ''} 
+            onClick={() => setActiveSection('teachers')} 
+            aria-label="Teachers"
+          >
             <span role="img" aria-label="teachers">🧑‍🏫</span> Teachers
           </button>
-          <button onClick={() => {}} aria-label="Fee Management">
+          <button 
+            className={activeSection === 'fee' ? 'active' : ''} 
+            onClick={() => setActiveSection('fee')} 
+            aria-label="Fee Management"
+          >
             <span role="img" aria-label="fee">💳</span> Fee Management
           </button>
           <button onClick={() => {}} aria-label="Security">
@@ -168,6 +178,8 @@ function AdminDashboard({ onSignOut }) {
             </div>
           </div>
         )}
+        {activeSection === 'teachers' && <Teachers embedded={true} />}
+        {activeSection === 'fee' && <FeeManagement embedded={true} />}
       </main>
     </div>
   );
