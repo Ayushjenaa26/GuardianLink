@@ -18,13 +18,13 @@ function Reports({ onSignOut }) {
           by <a href="https://edutrackers.com" target="_blank" rel="noopener noreferrer">EduTrackers</a>
         </div>
         <nav className="parent-nav">
-          <a href="#dashboard">Dashboard</a>
-          <a href="#notifications">Notifications</a>
-          <a className="active" href="#reports">Reports</a>
-          <a href="#attendance">Attendance</a>
-          <a href="#marks">Marks & KTs</a>
-          <a href="#fees">Fee Status</a>
-          <a href="#behavior">Behavior</a>
+          <button onClick={() => {}} aria-label="Go to Dashboard">Dashboard</button>
+          <button onClick={() => {}} aria-label="Go to Notifications">Notifications</button>
+          <button className="active" onClick={() => {}} aria-label="Current Reports">Reports</button>
+          <button onClick={() => {}} aria-label="Go to Attendance">Attendance</button>
+          <button onClick={() => {}} aria-label="Go to Marks">Marks & KTs</button>
+          <button onClick={() => {}} aria-label="Go to Fee Status">Fee Status</button>
+          <button onClick={() => {}} aria-label="Go to Behavior">Behavior</button>
         </nav>
         <div className="parent-user">
           <div className="parent-avatar">👤</div>

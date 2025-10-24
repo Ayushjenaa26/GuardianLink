@@ -1,5 +1,5 @@
 import React from 'react';
-import './ParentDashboard.css';
+import '../ParentSide/ParentDashboard.css';
 
 const students = [
   {

@@ -5,7 +5,7 @@ import MarksKTS from './MarksKTS';
 import FeeStatus from './FeeStatus';
 
 
-function ParentDashboard() {
+function ParentDashboard({ onSignOut }) {
   const [activeSection, setActiveSection] = useState('dashboard');
   return (
     <div className="parent-layout">
@@ -22,13 +22,13 @@ function ParentDashboard() {
           by <a href="https://edutrackers.com" target="_blank" rel="noopener noreferrer">EduTrackers</a>
         </div>
         <nav className="parent-nav">
-          <a className={activeSection === 'dashboard' ? 'active' : ''} href="#" onClick={() => setActiveSection('dashboard')}>Dashboard</a>
-          <a className={activeSection === 'notifications' ? 'active' : ''} href="#" onClick={() => setActiveSection('notifications')}>Notifications</a>
-          <a className={activeSection === 'reports' ? 'active' : ''} href="#" onClick={() => setActiveSection('reports')}>Reports</a>
-          <a className={activeSection === 'attendance' ? 'active' : ''} href="#" onClick={() => setActiveSection('attendance')}>Attendance</a>
-          <a className={activeSection === 'marks' ? 'active' : ''} href="#" onClick={() => setActiveSection('marks')}>Marks & KTs</a>
-          <a className={activeSection === 'fee' ? 'active' : ''} href="#" onClick={() => setActiveSection('fee')}>Fee Status</a>
-          <a className={activeSection === 'behavior' ? 'active' : ''} href="#" onClick={() => setActiveSection('behavior')}>Behavior</a>
+          <button className={activeSection === 'dashboard' ? 'active' : ''} onClick={() => setActiveSection('dashboard')}>Dashboard</button>
+          <button className={activeSection === 'notifications' ? 'active' : ''} onClick={() => setActiveSection('notifications')}>Notifications</button>
+          <button className={activeSection === 'reports' ? 'active' : ''} onClick={() => setActiveSection('reports')}>Reports</button>
+          <button className={activeSection === 'attendance' ? 'active' : ''} onClick={() => setActiveSection('attendance')}>Attendance</button>
+          <button className={activeSection === 'marks' ? 'active' : ''} onClick={() => setActiveSection('marks')}>Marks & KTs</button>
+          <button className={activeSection === 'fee' ? 'active' : ''} onClick={() => setActiveSection('fee')}>Fee Status</button>
+          <button className={activeSection === 'behavior' ? 'active' : ''} onClick={() => setActiveSection('behavior')}>Behavior</button>
         </nav>
         <div className="parent-user">
           <div className="parent-avatar">👤</div>
@@ -38,7 +38,7 @@ function ParentDashboard() {
             <div className="parent-user-id">CS-2025-001</div>
           </div>
         </div>
-        <button className="parent-signout">↩ Sign Out</button>
+        <button className="parent-signout" onClick={onSignOut ? onSignOut : undefined}>↩ Sign Out</button>
       </aside>
       <main className="parent-main">
         {activeSection === 'dashboard' && (
@@ -100,13 +100,13 @@ function ParentDashboard() {
           </>
         )}
         {activeSection === 'reports' && (
-          <Reports />
+          <Reports onSignOut={onSignOut} />
         )}
         {activeSection === 'marks' && (
-          <MarksKTS />
+          <MarksKTS onSignOut={onSignOut} />
         )}
         {activeSection === 'fee' && (
-          <FeeStatus />
+          <FeeStatus onSignOut={onSignOut} />
         )}
         {/* You can add similar conditional rendering for other sections if needed */}
       </main>

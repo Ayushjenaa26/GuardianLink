@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './App.css';
 import HomePage from './HomePage';
-import ParentDashboard from './ParentDashboard';
-import TeacherDashboard from './TeacherDashboard';
-import AdminDashboard from './AdminDashboard';
+import ParentDashboard from './ParentSide/ParentDashboard';
+import TeacherDashboard from './TeacherSide/TeacherDashboard';
+import AdminDashboard from './AdminSide/AdminDashboard';
 
 const roles = [
   { 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import './ParentDashboard.css';
+import '../ParentSide/ParentDashboard.css';
 import TeacherReports from './TeacherReports';
 import TeacherAttendance from './TeacherAttendance';
-import MyStudents from './MyStudents';
+import MyStudents from '../MyStudents';
 import MarksKT from './MarksKt';
 import BehaviorReports from './BehaviorReports';
 
@@ -24,24 +24,24 @@ function TeacherDashboard() {
           by <a href="https://edutrackers.com" target="_blank" rel="noopener noreferrer">EduTrackers</a>
         </div>
         <nav className="parent-nav">
-          <a className={activeSection === 'dashboard' ? 'active' : ''} href="#" onClick={() => setActiveSection('dashboard')}>
+          <button className={activeSection === 'dashboard' ? 'active' : ''} type="button" onClick={() => setActiveSection('dashboard')}>
             <span role="img" aria-label="dashboard">📋</span> Dashboard
-          </a>
-          <a className={activeSection === 'reports' ? 'active' : ''} href="#" onClick={() => setActiveSection('reports')}>
+          </button>
+          <button className={activeSection === 'reports' ? 'active' : ''} type="button" onClick={() => setActiveSection('reports')}>
             <span role="img" aria-label="reports">📄</span> Reports
-          </a>
-          <a className={activeSection === 'attendance' ? 'active' : ''} href="#" onClick={() => setActiveSection('attendance')}>
+          </button>
+          <button className={activeSection === 'attendance' ? 'active' : ''} type="button" onClick={() => setActiveSection('attendance')}>
             <span role="img" aria-label="attendance">🗓️</span> Attendance
-          </a>
-          <a className={activeSection === 'marks' ? 'active' : ''} href="#" onClick={() => setActiveSection('marks')}>
+          </button>
+          <button className={activeSection === 'marks' ? 'active' : ''} type="button" onClick={() => setActiveSection('marks')}>
             <span role="img" aria-label="marks">📊</span> Marks & KTs
-          </a>
-          <a className={activeSection === 'students' ? 'active' : ''} href="#" onClick={() => setActiveSection('students')}>
+          </button>
+          <button className={activeSection === 'students' ? 'active' : ''} type="button" onClick={() => setActiveSection('students')}>
             <span role="img" aria-label="students">👨‍🎓</span> My Students
-          </a>
-          <a className={activeSection === 'behavior' ? 'active' : ''} href="#" onClick={() => setActiveSection('behavior')}>
+          </button>
+          <button className={activeSection === 'behavior' ? 'active' : ''} type="button" onClick={() => setActiveSection('behavior')}>
             <span role="img" aria-label="behavior">📈</span> Behavior Reports
-          </a>
+          </button>
         </nav>
         <div className="parent-user">
           <div className="parent-avatar" style={{background:'#6a4cf7'}}> 
