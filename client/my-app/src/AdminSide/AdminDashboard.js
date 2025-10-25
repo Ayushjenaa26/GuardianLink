@@ -110,7 +110,7 @@ function AdminDashboard({ onSignOut }) {
           >
             <span role="img" aria-label="notifications">🔔</span> Notifications
           </button>
-          <button 
+          <button
             className={activeSection === 'reports' ? 'active' : ''} 
             onClick={() => setActiveSection('reports')} 
             aria-label="Reports"
