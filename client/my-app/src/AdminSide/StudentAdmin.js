@@ -384,7 +384,7 @@ function Students({ embedded = false }) {
         </div>
         <nav className="parent-nav">
           <a href="/admin-dashboard"><span role="img" aria-label="dashboard">📋</span> Dashboard</a>
-          <button type="button"><span role="img" aria-label="notifications">🔔</span> Notifications</button>
+          <button type="button">< span role="img" aria-label="notifications">🔔></span> Notifications</button>
           <button type="button"><span role="img" aria-label="reports">📄</span> Reports</button>
           <button type="button" className="active"><span role="img" aria-label="students">🧑‍🎓</span> Students</button>
           <button type="button"><span role="img" aria-label="teachers">🧑‍🏫</span> Teachers</button>
