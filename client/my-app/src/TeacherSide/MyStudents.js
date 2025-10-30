@@ -92,23 +92,38 @@ const MyStudents = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Present': return '#22c55e';
-      case 'Absent': return '#ef4444';
-      case 'Late': return '#f59e0b';
-      default: return '#6b7280';
+      case 'Present': return 'getStatusColor-Present';
+      case 'Absent': return 'getStatusColor-Absent';
+      case 'Late': return 'getStatusColor-Late';
+      default: return 'getStatusColor-Present';
     }
   };
 
   const getPerformanceColor = (score) => {
-    if (score >= 90) return '#22c55e';
-    if (score >= 75) return '#f59e0b';
-    return '#ef4444';
+    if (score >= 90) return 'getPerformanceColor-90';
+    if (score >= 75) return 'getPerformanceColor-75';
+    return 'getPerformanceColor-low';
   };
 
   const getAttendanceColor = (attendance) => {
-    if (attendance >= 90) return '#22c55e';
-    if (attendance >= 80) return '#f59e0b';
-    return '#ef4444';
+    if (attendance >= 90) return 'getAttendanceColor-90';
+    if (attendance >= 80) return 'getAttendanceColor-80';
+    return 'getAttendanceColor-low';
+  };
+
+  const getAvatarColor = (name) => {
+    const colors = [
+      'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+      'linear-gradient(135deg, #ef4444, #dc2626)',
+      'linear-gradient(135deg, #10b981, #059669)',
+      'linear-gradient(135deg, #f59e0b, #d97706)',
+      'linear-gradient(135deg, #3b82f6, #2563eb)',
+      'linear-gradient(135deg, #ec4899, #db2777)',
+      'linear-gradient(135deg, #6366f1, #4f46e5)',
+      'linear-gradient(135deg, #14b8a6, #0d9488)'
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
   };
 
   return (
@@ -143,7 +158,7 @@ const MyStudents = () => {
             >
               <div className="batch-header">
                 <span className="batch-id">{batch.id}</span>
-                <span className="batch-performance" style={{ color: getPerformanceColor(batch.averageAttendance) }}>
+                <span className="batch-performance" style={{ color: batch.averageAttendance >= 90 ? '#22c55e' : batch.averageAttendance >= 80 ? '#f59e0b' : '#ef4444' }}>
                   {batch.performance}
                 </span>
               </div>
@@ -226,7 +241,10 @@ const MyStudents = () => {
               {filteredStudents.map((student) => (
                 <div key={student.id} className="student-card">
                   <div className="student-header">
-                    <div className="student-avatar">
+                    <div 
+                      className="student-avatar"
+                      style={{ background: getAvatarColor(student.name) }}
+                    >
                       {student.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div className="student-basic-info">
@@ -234,8 +252,7 @@ const MyStudents = () => {
                       <span className="student-id">{student.id}</span>
                     </div>
                     <div 
-                      className="status-badge"
-                      style={{ background: getStatusColor(student.status) }}
+                      className={`status-badge ${getStatusColor(student.status)}`}
                     >
                       {student.status}
                     </div>
@@ -245,8 +262,7 @@ const MyStudents = () => {
                     <div className="student-stat">
                       <span className="stat-label">Attendance</span>
                       <span 
-                        className="stat-value"
-                        style={{ color: getAttendanceColor(student.attendance) }}
+                        className={`stat-value ${getAttendanceColor(student.attendance)}`}
                       >
                         {student.attendance}%
                       </span>
@@ -254,8 +270,7 @@ const MyStudents = () => {
                     <div className="student-stat">
                       <span className="stat-label">Overall Score</span>
                       <span 
-                        className="stat-value"
-                        style={{ color: getPerformanceColor(student.overallScore) }}
+                        className={`stat-value ${getPerformanceColor(student.overallScore)}`}
                       >
                         {student.overallScore}%
                       </span>

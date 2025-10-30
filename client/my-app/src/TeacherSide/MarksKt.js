@@ -157,14 +157,36 @@ const MarksKT = () => {
 
   const getKTStatusColor = (status) => {
     switch (status) {
-      case 'Clear': return '#22c55e';
-      case 'At Risk': return '#f59e0b';
-      case 'KT Pending': return '#ef4444';
+      case 'Clear': return 'getKTStatusColor-Clear';
+      case 'At Risk': return 'getKTStatusColor-Risk';
+      case 'KT Pending': return 'getKTStatusColor-Pending';
       default: return '#6b7280';
     }
   };
 
+  const getPerformanceColorClass = (score) => {
+    if (score >= 80) return 'getPerformanceColor-80';
+    if (score >= 60) return 'getPerformanceColor-60';
+    return 'getPerformanceColor-low';
+  };
+
   const currentTrends = performanceTrends[activeSubject];
+
+  // Function to generate random color for avatars
+  const getAvatarColor = (name) => {
+    const colors = [
+      'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+      'linear-gradient(135deg, #ef4444, #dc2626)',
+      'linear-gradient(135deg, #10b981, #059669)',
+      'linear-gradient(135deg, #f59e0b, #d97706)',
+      'linear-gradient(135deg, #3b82f6, #2563eb)',
+      'linear-gradient(135deg, #ec4899, #db2777)',
+      'linear-gradient(135deg, #6366f1, #4f46e5)',
+      'linear-gradient(135deg, #14b8a6, #0d9488)'
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
 
   return (
     <div className="marks-kt-container">
@@ -284,7 +306,10 @@ const MarksKT = () => {
               <div className="attention-list">
                 {currentTrends.needsAttention.map((student, index) => (
                   <div key={index} className="attention-item">
-                    <div className="student-avatar" style={{background: '#ef4444'}}>
+                    <div 
+                      className="student-avatar" 
+                      style={{background: getAvatarColor(student)}}
+                    >
                       {student.charAt(0)}
                     </div>
                     <div className="student-info">
@@ -337,7 +362,10 @@ const MarksKT = () => {
                     return (
                       <tr key={student.id}>
                         <td className="student-cell">
-                          <div className="student-avatar-small" style={{background: '#6366f1'}}>
+                          <div 
+                            className="student-avatar-small" 
+                            style={{background: getAvatarColor(student.name)}}
+                          >
                             {student.name.charAt(0)}
                           </div>
                           <div>
@@ -352,8 +380,7 @@ const MarksKT = () => {
                         </td>
                         <td>
                           <div 
-                            className="score-display"
-                            style={{color: getPerformanceColor(assignmentsAvg)}}
+                            className={`score-display ${getPerformanceColorClass(assignmentsAvg)}`}
                           >
                             {assignmentsAvg}%
                           </div>
@@ -363,8 +390,7 @@ const MarksKT = () => {
                             {student.exams.map((score, idx) => (
                               <span 
                                 key={idx}
-                                className="exam-score"
-                                style={{color: getPerformanceColor(score)}}
+                                className={`exam-score ${getPerformanceColorClass(score)}`}
                               >
                                 {score}%
                               </span>
@@ -373,16 +399,14 @@ const MarksKT = () => {
                         </td>
                         <td>
                           <div 
-                            className="overall-score"
-                            style={{color: getPerformanceColor(student.overall)}}
+                            className={`overall-score ${getPerformanceColorClass(student.overall)}`}
                           >
                             {student.overall}%
                           </div>
                         </td>
                         <td>
                           <span 
-                            className="kt-badge"
-                            style={{background: getKTStatusColor(student.ktStatus)}}
+                            className={`kt-badge ${getKTStatusColor(student.ktStatus)}`}
                           >
                             {student.ktStatus}
                           </span>
@@ -489,7 +513,10 @@ const MarksKT = () => {
                   .map((student, index) => (
                     <div key={index} className="kt-item urgent">
                       <div className="kt-student-info">
-                        <div className="student-avatar" style={{background: '#ef4444'}}>
+                        <div 
+                          className="student-avatar" 
+                          style={{background: getAvatarColor(student.name)}}
+                        >
                           {student.name.charAt(0)}
                         </div>
                         <div>
@@ -518,7 +545,10 @@ const MarksKT = () => {
                   .map((student, index) => (
                     <div key={index} className="kt-item warning">
                       <div className="kt-student-info">
-                        <div className="student-avatar" style={{background: '#f59e0b'}}>
+                        <div 
+                          className="student-avatar" 
+                          style={{background: getAvatarColor(student.name)}}
+                        >
                           {student.name.charAt(0)}
                         </div>
                         <div>
