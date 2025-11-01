@@ -383,15 +383,15 @@ function Students({ embedded = false }) {
           by <a href="https://edutrackers.com" target="_blank" rel="noopener noreferrer">EduTrackers</a>
         </div>
         <nav className="parent-nav">
-          <a href="/admin-dashboard"><span role="img" aria-label="dashboard">📋</span> Dashboard</a>
-          <button type="button">< span role="img" aria-label="notifications">🔔></span> Notifications</button>
-          <button type="button"><span role="img" aria-label="reports">📄</span> Reports</button>
-          <button type="button" className="active"><span role="img" aria-label="students">🧑‍🎓</span> Students</button>
-          <button type="button"><span role="img" aria-label="teachers">🧑‍🏫</span> Teachers</button>
-          <button type="button"><span role="img" aria-label="fee">💳</span> Fee Management</button>
-          <button type="button"><span role="img" aria-label="security">🛡️</span> Security & Audit</button>
-          <button type="button"><span role="img" aria-label="settings">⚙️</span> Settings</button>
-        </nav>
+           <a href="/admin-dashboard"><span role="img" aria-label="dashboard">📋</span> Dashboard</a>
+                <button type="button"><span role="img" aria-label="notifications">🔔</span> Notifications</button>
+                <button type="button"><span role="img" aria-label="reports">📄</span> Reports</button>
+                <button type="button" class="active"><span role="img" aria-label="students">🧑‍🎓</span> Students</button>
+                <button type="button"><span role="img" aria-label="teachers">🧑‍🏫</span> Teachers</button>
+                <button type="button"><span role="img" aria-label="fee">💳</span> Fee Management</button>
+                <button type="button"><span role="img" aria-label="security">🛡️</span> Security & Audit</button>
+                <button type="button"><span role="img" aria-label="settings">⚙️</span> Settings</button>
+            </nav>
         <div className="parent-user">
           <div className="parent-avatar" style={{background:'#a855f7'}}> 
             <span role="img" aria-label="admin">🛡️</span>

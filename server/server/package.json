@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "guardianlink-server": "file:.."
+  }
+}

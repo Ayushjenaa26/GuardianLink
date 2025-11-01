@@ -1,5 +1,5 @@
 import React from 'react';
-import '../ParentSide/ParentDashboard.css';
+import './TeacherReports.css';
 
 const students = [
   {
@@ -54,10 +54,10 @@ const topPerformers = [
 ];
 
 function getGradeColor(grade) {
-  if (grade === "A") return "#22c55e";
-  if (grade === "B") return "#2563eb";
-  if (grade === "C") return "#fbbf24";
-  return "#ef4444";
+  if (grade === "A") return "grade-A";
+  if (grade === "B") return "grade-B";
+  if (grade === "C") return "grade-C";
+  return "grade-D";
 }
 
 function getBehaviorClass(status) {
@@ -69,98 +69,105 @@ function getBehaviorClass(status) {
 
 export default function TeacherReports() {
   return (
-    <div style={{background:'#f7f8fc', minHeight:'100vh', padding:'32px'}}>
-      <div style={{maxWidth:1400, margin:'0 auto'}}>
-        <h2 style={{marginBottom:0}}>Student Reports</h2>
-        <div style={{color:'#888', marginBottom:24}}>Comprehensive overview of student performance and behavior</div>
-        <h1 style={{margin:'24px 0 18px 0'}}>Academic Reports</h1>
-        <div style={{display:'flex', gap:24, marginBottom:32}}>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontSize:'2rem', color:'#2563eb'}}>🎓</div>
-            <div style={{fontSize:'2rem', fontWeight:600}}>180</div>
-            <div style={{color:'#888'}}>Total Students</div>
+    <div className="teacher-reports">
+      <div className="reports-container">
+        <div className="reports-header">
+          <h2>Student Reports</h2>
+          <div className="reports-subtitle">Comprehensive overview of student performance and behavior</div>
+        </div>
+
+        <h3 className="section-title">Academic Reports</h3>
+
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon">🎓</div>
+            <div className="stat-value">180</div>
+            <div className="stat-label">Total Students</div>
           </div>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontSize:'2rem', color:'#22c55e'}}>📈</div>
-            <div style={{fontSize:'2rem', fontWeight:600}}>87%</div>
-            <div style={{color:'#888'}}>Average Performance</div>
+          <div className="stat-card">
+            <div className="stat-icon">📈</div>
+            <div className="stat-value">87%</div>
+            <div className="stat-label">Average Performance</div>
           </div>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontSize:'2rem', color:'#fbbf24'}}>📋</div>
-            <div style={{fontSize:'2rem', fontWeight:600}}>12</div>
-            <div style={{color:'#888'}}>Pending Reviews</div>
+          <div className="stat-card">
+            <div className="stat-icon">📋</div>
+            <div className="stat-value">12</div>
+            <div className="stat-label">Pending Reviews</div>
           </div>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontSize:'2rem', color:'#ef4444'}}>❗</div>
-            <div style={{fontSize:'2rem', fontWeight:600}}>5</div>
-            <div style={{color:'#888'}}>At-Risk Students</div>
+          <div className="stat-card">
+            <div className="stat-icon">❗</div>
+            <div className="stat-value">5</div>
+            <div className="stat-label">At-Risk Students</div>
           </div>
         </div>
-        <div style={{display:'flex', gap:24, marginBottom:32}}>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontWeight:600, fontSize:'1.15rem', marginBottom:12}}>Grade Distribution <span style={{float:'right', color:'#6366f1', fontWeight:400, fontSize:'1rem', cursor:'pointer'}}>View Details</span></div>
-            <ul style={{listStyle:'none', padding:0, margin:0}}>
+
+        <div className="content-grid">
+          <div className="content-card">
+            <div className="card-header">
+              <h4 className="card-title">Grade Distribution</h4>
+              <span className="view-link">View Details</span>
+            </div>
+            <ul className="grade-list">
               {gradeDist.map(g => (
-                <li key={g.label} style={{display:'flex', alignItems:'center', marginBottom:8}}>
-                  <span style={{width:12, height:12, borderRadius:'50%', background:g.color, display:'inline-block', marginRight:10}}></span>
-                  <span style={{flex:1}}>{g.label}</span>
-                  <span style={{color:'#888'}}>{g.count} students</span>
+                <li key={g.label} className="grade-item">
+                  <span className="grade-color" style={{background: g.color}}></span>
+                  <span className="grade-label">{g.label}</span>
+                  <span className="grade-count">{g.count} students</span>
                 </li>
               ))}
             </ul>
           </div>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontWeight:600, fontSize:'1.15rem', marginBottom:12}}>Top Performers <span style={{float:'right', color:'#6366f1', fontWeight:400, fontSize:'1rem', cursor:'pointer'}}>View All</span></div>
-            <ul style={{listStyle:'none', padding:0, margin:0}}>
+
+          <div className="content-card">
+            <div className="card-header">
+              <h4 className="card-title">Top Performers</h4>
+              <span className="view-link">View All</span>
+            </div>
+            <ul className="performer-list">
               {topPerformers.map(s => (
-                <li key={s.name} style={{display:'flex', alignItems:'center', marginBottom:10}}>
-                  <span style={{
-                    width:32, height:32, borderRadius:'50%', background:'#f3f3ff', color:'#444', fontWeight:600,
-                    display:'flex', alignItems:'center', justifyContent:'center', marginRight:12, fontSize:'1rem'
-                  }}>{s.initials}</span>
-                  <span style={{flex:1}}>{s.name}</span>
-                  <span style={{fontWeight:500}}>{s.percent}</span>
+                <li key={s.name} className="performer-item">
+                  <span className="initials">{s.initials}</span>
+                  <span className="student-name">{s.name}</span>
+                  <span className="performance-value">{s.percent}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
-        <div style={{background:'#fff', borderRadius:16, padding:24, marginBottom:32, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-          <div style={{fontWeight:600, fontSize:'1.15rem', marginBottom:18}}>Detailed Student Reports
-            <span style={{float:'right', color:'#6366f1', fontWeight:400, fontSize:'1rem', cursor:'pointer'}}>Export Full Report</span>
+
+        <div className="detailed-reports">
+          <div className="card-header">
+            <h4 className="card-title">Detailed Student Reports</h4>
+            <span className="view-link">Export Full Report</span>
           </div>
-          <div style={{overflowX:'auto'}}>
-            <table style={{width:'100%', borderCollapse:'collapse', fontSize:'1rem'}}>
+          <div className="table-container">
+            <table className="reports-table">
               <thead>
-                <tr style={{background:'#f7f8fc'}}>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Student Name</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Student ID</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Full Stack Dev</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Software Eng</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Computer Networks</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Database Systems</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Overall Grade</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Attendance</th>
-                  <th style={{padding:'10px 12px', textAlign:'left', fontWeight:600}}>Behavior</th>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Student ID</th>
+                  <th>Full Stack Dev</th>
+                  <th>Software Eng</th>
+                  <th>Computer Networks</th>
+                  <th>Database Systems</th>
+                  <th>Overall Grade</th>
+                  <th>Attendance</th>
+                  <th>Behavior</th>
                 </tr>
               </thead>
               <tbody>
                 {students.map(s => (
-                  <tr key={s.id} style={{borderBottom:'1px solid #f3f3ff'}}>
-                    <td style={{padding:'10px 12px'}}>{s.name}</td>
-                    <td style={{padding:'10px 12px'}}>{s.id}</td>
-                    <td style={{padding:'10px 12px', color:getGradeColor(s.grades.fsd), fontWeight:600}}>{s.grades.fsd}</td>
-                    <td style={{padding:'10px 12px', color:getGradeColor(s.grades.se), fontWeight:600}}>{s.grades.se}</td>
-                    <td style={{padding:'10px 12px', color:getGradeColor(s.grades.cn), fontWeight:600}}>{s.grades.cn}</td>
-                    <td style={{padding:'10px 12px', color:getGradeColor(s.grades.db), fontWeight:600}}>{s.grades.db}</td>
-                    <td style={{padding:'10px 12px', color:s.overall.startsWith('A') ? '#22c55e' : '#fbbf24', fontWeight:600}}>{s.overall}</td>
-                    <td style={{padding:'10px 12px'}}>{s.attendance}</td>
-                    <td style={{padding:'10px 12px'}}>
-                      <span className={getBehaviorClass(s.behavior)} style={{
-                        padding:'4px 14px', borderRadius:16, fontSize:'0.95rem', fontWeight:500,
-                        background: s.behavior === "Excellent" ? "#eafff2" : s.behavior === "Good" ? "#eaf2ff" : "#fef9c3",
-                        color: s.behavior === "Excellent" ? "#22c55e" : s.behavior === "Good" ? "#6366f1" : "#fbbf24"
-                      }}>
+                  <tr key={s.id}>
+                    <td className="student-name-cell">{s.name}</td>
+                    <td>{s.id}</td>
+                    <td className={getGradeColor(s.grades.fsd)}>{s.grades.fsd}</td>
+                    <td className={getGradeColor(s.grades.se)}>{s.grades.se}</td>
+                    <td className={getGradeColor(s.grades.cn)}>{s.grades.cn}</td>
+                    <td className={getGradeColor(s.grades.db)}>{s.grades.db}</td>
+                    <td className={s.overall.startsWith('A') ? 'grade-A' : 'grade-C'}>{s.overall}</td>
+                    <td>{s.attendance}</td>
+                    <td>
+                      <span className={`behavior-status ${getBehaviorClass(s.behavior)}`}>
                         {s.behavior}
                       </span>
                     </td>
@@ -170,65 +177,64 @@ export default function TeacherReports() {
             </table>
           </div>
         </div>
-        <div style={{display:'flex', gap:24, marginBottom:32}}>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontWeight:600, fontSize:'1.15rem', marginBottom:18}}>Behavior Reports
-              <span style={{float:'right', color:'#6366f1', fontWeight:400, fontSize:'1rem', cursor:'pointer'}}>View All</span>
+
+        <div className="content-grid">
+          <div className="content-card">
+            <div className="card-header">
+              <h4 className="card-title">Behavior Reports</h4>
+              <span className="view-link">View All</span>
             </div>
-            <ul style={{listStyle:'none', padding:0, margin:0}}>
+            <ul className="behavior-list">
               {behaviorList.map(b => (
-                <li key={b.name} style={{display:'flex', alignItems:'center', marginBottom:18}}>
-                  <span style={{
-                    width:32, height:32, borderRadius:'50%', background:'#f3f3ff', color:'#444', fontWeight:600,
-                    display:'flex', alignItems:'center', justifyContent:'center', marginRight:12, fontSize:'1rem'
-                  }}>{b.initials}</span>
-                  <span style={{flex:1}}>{b.name}</span>
-                  <span className={getBehaviorClass(b.status)} style={{
-                    padding:'4px 14px', borderRadius:16, fontSize:'0.95rem', fontWeight:500,
-                    background: b.status === "Excellent" ? "#eafff2" : b.status === "Good" ? "#eaf2ff" : b.status === "Needs Improvement" ? "#fef9c3" : "#fee2e2",
-                    color: b.status === "Excellent" ? "#22c55e" : b.status === "Good" ? "#6366f1" : b.status === "Needs Improvement" ? "#fbbf24" : "#b91c1c"
-                  }}>
+                <li key={b.name} className="behavior-item">
+                  <span className="initials">{b.initials}</span>
+                  <span className="student-name">{b.name}</span>
+                  <span className={`behavior-status ${getBehaviorClass(b.status)}`}>
                     {b.status}
                   </span>
                 </li>
               ))}
             </ul>
           </div>
-          <div style={{background:'#fff', borderRadius:16, padding:24, flex:1, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-            <div style={{fontWeight:600, fontSize:'1.15rem', marginBottom:18}}>Subject Performance
-              <span style={{float:'right', color:'#6366f1', fontWeight:400, fontSize:'1rem', cursor:'pointer'}}>View Details</span>
+
+          <div className="content-card">
+            <div className="card-header">
+              <h4 className="card-title">Subject Performance</h4>
+              <span className="view-link">View Details</span>
             </div>
-            <ul style={{listStyle:'none', padding:0, margin:0}}>
+            <ul className="subject-list">
               {subjectPerformance.map(s => (
-                <li key={s.name} style={{display:'flex', alignItems:'center', marginBottom:18}}>
-                  <span style={{fontSize:'1.3rem', marginRight:14}}>{s.icon}</span>
-                  <span style={{flex:1}}>{s.name}</span>
-                  <span style={{fontWeight:500}}>{s.percent}</span>
+                <li key={s.name} className="subject-item">
+                  <span className="subject-icon">{s.icon}</span>
+                  <span className="subject-name">{s.name}</span>
+                  <span className="subject-percent">{s.percent}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
-        <div style={{background:'#fff', borderRadius:16, padding:24, marginBottom:32, boxShadow:'0 2px 8px rgba(80,80,160,0.08)'}}>
-          <div style={{fontWeight:600, fontSize:'1.15rem', marginBottom:18}}>Academic Reports
-            <span style={{float:'right', color:'#6366f1', fontWeight:400, fontSize:'1rem', cursor:'pointer'}}>Export Data</span>
+
+        <div className="academic-summary">
+          <div className="card-header">
+            <h4 className="card-title">Academic Reports</h4>
+            <span className="view-link">Export Data</span>
           </div>
-          <div style={{display:'flex', gap:24}}>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:500, marginBottom:8}}>Total Students</div>
-              <div style={{fontSize:'2rem', fontWeight:600, color:'#2563eb'}}>180</div>
+          <div className="summary-grid">
+            <div className="summary-item">
+              <div className="summary-label">Total Students</div>
+              <div className="summary-value summary-students">180</div>
             </div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:500, marginBottom:8}}>Average Performance</div>
-              <div style={{fontSize:'2rem', fontWeight:600, color:'#22c55e'}}>87%</div>
+            <div className="summary-item">
+              <div className="summary-label">Average Performance</div>
+              <div className="summary-value summary-performance">87%</div>
             </div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:500, marginBottom:8}}>Pending Reviews</div>
-              <div style={{fontSize:'2rem', fontWeight:600, color:'#fbbf24'}}>12</div>
+            <div className="summary-item">
+              <div className="summary-label">Pending Reviews</div>
+              <div className="summary-value summary-reviews">12</div>
             </div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:500, marginBottom:8}}>At-Risk Students</div>
-              <div style={{fontSize:'2rem', fontWeight:600, color:'#ef4444'}}>5</div>
+            <div className="summary-item">
+              <div className="summary-label">At-Risk Students</div>
+              <div className="summary-value summary-risk">5</div>
             </div>
           </div>
         </div>

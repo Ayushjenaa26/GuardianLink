@@ -27,10 +27,17 @@ const TeacherAttendance = () => {
   const [selectedMonth, setSelectedMonth] = useState('October 2023');
 
   const getAttendanceColor = (val) => {
-    if (val === "P") return "#22c55e";
-    if (val === "A") return "#ef4444";
-    if (val === "L") return "#fbbf24";
-    return "#444";
+    if (val === "P") return "#10b981"; // Green for present
+    if (val === "A") return "#ef4444"; // Red for absent
+    if (val === "L") return "#f59e0b"; // Amber for late
+    return "#94a3b8";
+  };
+
+  const getAttendanceLabel = (val) => {
+    if (val === "P") return "Present";
+    if (val === "A") return "Absent";
+    if (val === "L") return "Late";
+    return "Unknown";
   };
 
   const getOverallAttendance = (attArr) => {
@@ -53,16 +60,23 @@ const TeacherAttendance = () => {
     { name: 'Section A4', teacher: 'Taught by Prof. Davis', rate: 86 }
   ];
 
+  // Today's attendance status for demonstration
+  const todaysAttendance = students.map((student, index) => ({
+    name: student,
+    initials: student.split(' ').map(n => n[0]).join(''),
+    status: index === 3 ? 'absent' : index === 8 ? 'late' : 'present'
+  }));
+
   return (
     <div className="teacher-attendance">
       {/* Header Section */}
       <div className="attendance-header">
         <div className="header-content">
-          <h1>Class A1 Attendance</h1>
-          <p>Track and manage student attendance for your class</p>
+          <h1>📊 Class A1 Attendance</h1>
+          <p>Track and manage student attendance with real-time insights and analytics</p>
         </div>
         <div className="header-actions">
-          <button className="btn-export">Export Report</button>
+          <button className="btn-export">📥 Export Report</button>
         </div>
       </div>
 
@@ -72,19 +86,19 @@ const TeacherAttendance = () => {
           className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
         >
-          Class Attendance
+          🏠 Class Overview
         </button>
         <button 
           className={`tab-btn ${activeTab === 'trends' ? 'active' : ''}`}
           onClick={() => setActiveTab('trends')}
         >
-          Class A1 Trends
+          📈 Attendance Trends
         </button>
         <button 
           className={`tab-btn ${activeTab === 'detailed' ? 'active' : ''}`}
           onClick={() => setActiveTab('detailed')}
         >
-          Detailed Attendance
+          📋 Detailed Records
         </button>
       </div>
 
@@ -95,27 +109,30 @@ const TeacherAttendance = () => {
           <div className="stats-grid">
             <div className="stat-card primary">
               <div className="stat-value">94%</div>
-              <div className="stat-label">Class Attendance Rate</div>
-              <div className="stat-subtext">Class: A1</div>
+              <div className="stat-label">Overall Attendance Rate</div>
+              <div className="stat-subtext">Excellent performance this month</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">18</div>
               <div className="stat-label">Students Present Today</div>
+              <div className="stat-subtext">Out of 21 total students</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">2</div>
               <div className="stat-label">Students Absent Today</div>
+              <div className="stat-subtext">Need to follow up</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">1</div>
               <div className="stat-label">Late Arrivals Today</div>
+              <div className="stat-subtext">1 student arrived late</div>
             </div>
           </div>
 
           {/* Action Button */}
           <div className="action-section">
             <button className="btn-mark-attendance">
-              Mark Today's Attendance
+              ✅ Mark Today's Attendance
             </button>
           </div>
 
@@ -123,8 +140,8 @@ const TeacherAttendance = () => {
             {/* Class Sections */}
             <div className="content-card">
               <div className="card-header">
-                <h3>Class Sections Summary</h3>
-                <span className="view-all">View All</span>
+                <h3>🏫 Class Sections Summary</h3>
+                <span className="view-all">View All →</span>
               </div>
               <div className="sections-list">
                 {classSections.map((section, index) => (
@@ -142,25 +159,21 @@ const TeacherAttendance = () => {
             {/* Today's Attendance */}
             <div className="content-card">
               <div className="card-header">
-                <h3>Today's Attendance - Class A1</h3>
-                <span className="view-all">View All</span>
+                <h3>📅 Today's Attendance - Class A1</h3>
+                <span className="view-all">View All →</span>
               </div>
               <div className="attendance-list">
-                {students.slice(0, 8).map((student, index) => (
+                {todaysAttendance.slice(0, 9).map((student, index) => (
                   <div key={index} className="attendance-item">
                     <div className="student-initials">
-                      {student.split(' ').map(n => n[0]).join('')}
+                      {student.initials}
                     </div>
-                    <div className="student-name">{student}</div>
-                    <div className="attendance-status present">Present</div>
+                    <div className="student-name">{student.name}</div>
+                    <div className={`attendance-status ${student.status}`}>
+                      {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
+                    </div>
                   </div>
                 ))}
-                {/* Show absent student */}
-                <div className="attendance-item">
-                  <div className="student-initials">SH</div>
-                  <div className="student-name">Shah</div>
-                  <div className="attendance-status absent">Absent</div>
-                </div>
               </div>
             </div>
           </div>
@@ -172,10 +185,10 @@ const TeacherAttendance = () => {
         <div className="tab-content">
           <div className="content-grid">
             <div className="content-card">
-              <h3>Weekly Average</h3>
+              <h3>📊 Weekly Performance Trends</h3>
               <div className="trend-item">
                 <div className="trend-value positive">+2.1%</div>
-                <span className="view-report">View Report</span>
+                <span className="view-report">View Detailed Report →</span>
               </div>
               <div className="trend-stats">
                 <div className="trend-stat">
@@ -190,11 +203,15 @@ const TeacherAttendance = () => {
                   <span>Perfect Attendance</span>
                   <span className="positive">+3 Students</span>
                 </div>
+                <div className="trend-stat">
+                  <span>Class Participation</span>
+                  <span className="positive">+8%</span>
+                </div>
               </div>
             </div>
 
             <div className="content-card">
-              <h3>Monthly Overview - Class A1</h3>
+              <h3>📈 Monthly Overview - Class A1</h3>
               <div className="monthly-list">
                 {monthlyData.map((monthData, index) => (
                   <div key={index} className="monthly-item">
@@ -203,7 +220,7 @@ const TeacherAttendance = () => {
                   </div>
                 ))}
               </div>
-              <button className="btn-view-history">View History</button>
+              <button className="btn-view-history">📚 View Complete History</button>
             </div>
           </div>
         </div>
@@ -213,6 +230,7 @@ const TeacherAttendance = () => {
       {activeTab === 'detailed' && (
         <div className="tab-content">
           <div className="content-card">
+            <h3 style={{marginBottom: '20px', color: '#f0f4ff'}}>📋 Detailed Attendance Records</h3>
             <div className="table-container">
               <table className="attendance-table">
                 <thead>
@@ -222,7 +240,7 @@ const TeacherAttendance = () => {
                     {dates.map(date => (
                       <th key={date}>{date}</th>
                     ))}
-                    <th>Overall Attendance</th>
+                    <th>Overall %</th>
                     <th>Absences</th>
                     <th>Late Arrivals</th>
                   </tr>
@@ -239,15 +257,20 @@ const TeacherAttendance = () => {
                             key={idx} 
                             className="attendance-cell"
                             style={{ color: getAttendanceColor(val) }}
+                            title={`${dates[idx]}: ${getAttendanceLabel(val)}`}
                           >
                             {val}
                           </td>
                         ))}
-                        <td className={`overall-cell ${overall === 100 ? 'perfect' : 'good'}`}>
+                        <td className={`overall-cell ${overall >= 95 ? 'perfect' : overall >= 85 ? 'good' : ''}`}>
                           {overall}%
                         </td>
-                        <td>{student.absences}</td>
-                        <td>{student.late}</td>
+                        <td style={{color: student.absences > 0 ? '#ef4444' : '#10b981', fontWeight: '600'}}>
+                          {student.absences}
+                        </td>
+                        <td style={{color: student.late > 0 ? '#f59e0b' : '#10b981', fontWeight: '600'}}>
+                          {student.late}
+                        </td>
                       </tr>
                     );
                   })}
