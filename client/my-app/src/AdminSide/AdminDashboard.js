@@ -106,12 +106,6 @@ function AdminDashboard({ onSignOut }) {
           >
             <span role="img" aria-label="dashboard">📋</span> Dashboard
           </button>
-          <button 
-            onClick={() => setActiveSection('notifications')} 
-            aria-label="Notifications"
-          >
-            <span role="img" aria-label="notifications">🔔</span> Notifications
-          </button>
           <button
             className={activeSection === 'reports' ? 'active' : ''} 
             onClick={() => setActiveSection('reports')} 
@@ -133,18 +127,12 @@ function AdminDashboard({ onSignOut }) {
           >
             <span role="img" aria-label="teachers">🧑‍🏫</span> Teachers
           </button>
-          <button 
-            className={activeSection === 'fee' ? 'active' : ''} 
-            onClick={() => setActiveSection('fee')} 
+          <button
+            className={activeSection === 'fee' ? 'active' : ''}
+            onClick={() => setActiveSection('fee')}
             aria-label="Fee Management"
           >
             <span role="img" aria-label="fee">💳</span> Fee Management
-          </button>
-          <button onClick={() => {}} aria-label="Security">
-            <span role="img" aria-label="security">🛡️</span> Security & Audit
-          </button>
-          <button onClick={() => {}} aria-label="Settings">
-            <span role="img" aria-label="settings">⚙️</span> Settings
           </button>
         </nav>
         <div className="parent-user">
@@ -164,20 +152,6 @@ function AdminDashboard({ onSignOut }) {
         {activeSection === 'dashboard' && renderDashboardContent()}
         {activeSection === 'reports' && <ReportAdmin embedded={true} />}
         {activeSection === 'students' && <StudentAdmin embedded={true} />}
-        {activeSection === 'notifications' && (
-          <div className="dashboard-content">
-            <header className="parent-header">
-              <div>
-                <h2>Notifications</h2>
-                <span className="parent-welcome">Stay updated with the latest alerts</span>
-              </div>
-            </header>
-            <div className="no-data">
-              <span role="img" aria-label="no notifications">🔔</span>
-              <p>No new notifications</p>
-            </div>
-          </div>
-        )}
         {activeSection === 'teachers' && <Teachers embedded={true} />}
         {activeSection === 'fee' && <FeeManagement embedded={true} />}
       </main>

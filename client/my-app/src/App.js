@@ -4,7 +4,6 @@ import HomePage from './HomePage';
 import ParentDashboard from './ParentSide/ParentDashboard';
 import TeacherDashboard from './TeacherSide/TeacherDashboard';
 import AdminDashboard from './AdminSide/AdminDashboard';
-import SecurityAudit from './AdminSide/SecurityAudit';
 
 const roles = [
   { 
@@ -82,12 +81,7 @@ function App() {
     return <TeacherDashboard onSignOut={handleSignOut} />;
   }
   if (signedIn && role === 'Administrator') {
-    return (
-      <>
-        <AdminDashboard onSignOut={handleSignOut} />
-        <SecurityAudit />
-      </>
-    );
+    return <AdminDashboard onSignOut={handleSignOut} />;
   }
 
   // Render authentication page
