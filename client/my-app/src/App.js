@@ -5,7 +5,7 @@ import ParentDashboard from './ParentSide/ParentDashboard';
 import TeacherDashboard from './TeacherSide/TeacherDashboard';
 import AdminDashboard from './AdminSide/AdminDashboard';
 import SecurityAudit from './AdminSide/SecurityAudit';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './AuthContext';
 
 const roles = [
   { 
@@ -29,7 +29,7 @@ const roles = [
 ];
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'auth', or 'dashboard'
+  const [currentPage, setCurrentPage] = useState('home');
   const [activeTab, setActiveTab] = useState('signin');
   const [role, setRole] = useState('');
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
@@ -41,7 +41,7 @@ function App() {
     // Check if user is already authenticated
     if (user) {
       setSignedIn(true);
-      setRole(user.role.charAt(0).toUpperCase() + user.role.slice(1));
+      setRole(user.role);
       setCurrentPage('dashboard');
     }
   }, [user]);
@@ -49,31 +49,45 @@ function App() {
   // Handle sign in
   const handleSignIn = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+
+    if (!role) {
+      alert('Please select your role');
+      return;
+    }
 
     try {
       await login(email, password, role);
-      // Auth context will update user state and trigger useEffect above
     } catch (err) {
       console.error('Login failed:', err);
-      // You can show an error message to the user here
     }
   };
 
   // Handle sign up
   const handleSignUp = async (e) => {
     e.preventDefault();
-    const name = e.target.name.value;
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const formData = new FormData(e.target);
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+
+    if (!role) {
+      alert('Please select your role');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
 
     try {
       await register(name, email, password, role);
-      // Auth context will update user state and trigger useEffect above
     } catch (err) {
       console.error('Registration failed:', err);
-      // You can show an error message to the user here
     }
   };
 
@@ -101,31 +115,22 @@ function App() {
   }
 
   // Render dashboards if signed in
-  if (signedIn && role === 'Parent') {
-    return <ParentDashboard onSignOut={handleSignOut} />;
-  }
-  if (signedIn && role === 'Teacher') {
-    return <TeacherDashboard onSignOut={handleSignOut} />;
-  }
-  // Render appropriate dashboard based on role
-  if (signedIn) {
-    if (role === 'Administrator') {
-      return (
-        <>
-          <AdminDashboard onSignOut={handleSignOut} />
-          <SecurityAudit />
-        </>
-      );
-    } else if (role === 'Teacher') {
-      return <TeacherDashboard onSignOut={handleSignOut} />;
-    } else if (role === 'Parent') {
-      return <ParentDashboard onSignOut={handleSignOut} />;
+  if (signedIn && user) {
+    switch (user.role) {
+      case 'Parent':
+        return <ParentDashboard user={user} onSignOut={handleSignOut} />;
+      case 'Teacher':
+        return <TeacherDashboard user={user} onSignOut={handleSignOut} />;
+      case 'Administrator':
+        return (
+          <>
+            <AdminDashboard user={user} onSignOut={handleSignOut} />
+            <SecurityAudit />
+          </>
+        );
+      default:
+        return <HomePage onNavigateToAuth={handleGoToAuth} />;
     }
-  }
-
-  // Render HomePage if not on auth or dashboard page
-  if (currentPage === 'home') {
-    return <HomePage onNavigateToAuth={() => setCurrentPage('auth')} />;
   }
 
   // Render authentication page
@@ -147,6 +152,20 @@ function App() {
         <div className="auth-powered">
           Powered by <a href="https://edutrackers.com" target="_blank" rel="noopener noreferrer">EduTrackers</a>
         </div>
+        
+        {/* Error Display */}
+        {error && (
+          <div className="auth-error" style={{ 
+            color: 'red', 
+            margin: '10px 0', 
+            textAlign: 'center',
+            padding: '10px',
+            backgroundColor: '#ffe6e6',
+            borderRadius: '5px'
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
         
         <div className="auth-tabs">
           <button
@@ -227,15 +246,9 @@ function App() {
               <label htmlFor="remember">Remember my credentials on this device</label>
             </div>
             
-            <button type="submit" className="auth-btn" disabled={loading}>
+            <button type="submit" className="auth-btn" disabled={loading || !role}>
               {loading ? 'Signing in...' : 'Sign In to GuardianLink →'}
             </button>
-            
-            {error && (
-              <div className="auth-error" style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>
-                {error}
-              </div>
-            )}
             
             <div className="auth-demo">
               <b>Demo Mode:</b>
@@ -244,7 +257,9 @@ function App() {
             </div>
             
             <div className="auth-footer">
-              <button onClick={(e) => { e.preventDefault(); /* Add forgot password handler */ }} style={{color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>Forgot Password?</button>
+              <button type="button" style={{color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>
+                Forgot Password?
+              </button>
               <span style={{margin: '0 8px'}}> | </span>
               <span style={{color: '#888'}}>Need help? Contact IT Support</span>
             </div>
@@ -330,19 +345,13 @@ function App() {
             <div className="auth-terms">
               <input type="checkbox" id="terms" required />
               <label htmlFor="terms">
-                I agree to the <button onClick={(e) => { e.preventDefault(); /* Add terms handler */ }} style={{color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>Terms of Service</button> and <button onClick={(e) => { e.preventDefault(); /* Add privacy handler */ }} style={{color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>Privacy Policy</button>
+                I agree to the Terms of Service and Privacy Policy
               </label>
             </div>
             
-            <button type="submit" className="auth-btn" disabled={loading}>
+            <button type="submit" className="auth-btn" disabled={loading || !role}>
               {loading ? 'Creating Account...' : 'Create Account →'}
             </button>
-            
-            {error && (
-              <div className="auth-error" style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>
-                {error}
-              </div>
-            )}
             
             <div className="auth-demo">
               <b>Demo Registration:</b>
