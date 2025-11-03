@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import HomePage from './HomePage';
+import './HomePage.css';
 import ParentDashboard from './ParentSide/ParentDashboard';
 import TeacherDashboard from './TeacherSide/TeacherDashboard';
 import AdminDashboard from './AdminSide/AdminDashboard';
-import SecurityAudit from './AdminSide/SecurityAudit';
-import { useAuth } from './AuthContext';
+import { useAuth } from './context/AuthContext';
 
 const roles = [
   { 
@@ -122,12 +122,7 @@ function App() {
       case 'Teacher':
         return <TeacherDashboard user={user} onSignOut={handleSignOut} />;
       case 'Administrator':
-        return (
-          <>
-            <AdminDashboard user={user} onSignOut={handleSignOut} />
-            <SecurityAudit />
-          </>
-        );
+        return <AdminDashboard user={user} onSignOut={handleSignOut} />;
       default:
         return <HomePage onNavigateToAuth={handleGoToAuth} />;
     }
