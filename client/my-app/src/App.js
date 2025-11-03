@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import HomePage from './HomePage';
 import ParentDashboard from './ParentSide/ParentDashboard';
 import TeacherDashboard from './TeacherSide/TeacherDashboard';
 import AdminDashboard from './AdminSide/AdminDashboard';
 import SecurityAudit from './AdminSide/SecurityAudit';
+import { useAuth } from './context/AuthContext';
 
 const roles = [
   { 
@@ -34,21 +35,45 @@ function App() {
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
-  // Handle sign in
-  const handleSignIn = (e) => {
-    e.preventDefault();
-    if (role) {
+  const { login, register, logout, user, loading, error } = useAuth();
+
+  useEffect(() => {
+    // Check if user is already authenticated
+    if (user) {
       setSignedIn(true);
+      setRole(user.role.charAt(0).toUpperCase() + user.role.slice(1));
       setCurrentPage('dashboard');
+    }
+  }, [user]);
+
+  // Handle sign in
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    try {
+      await login(email, password, role);
+      // Auth context will update user state and trigger useEffect above
+    } catch (err) {
+      console.error('Login failed:', err);
+      // You can show an error message to the user here
     }
   };
 
   // Handle sign up
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    if (role) {
-      setSignedIn(true);
-      setCurrentPage('dashboard');
+    const name = e.target.name.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    try {
+      await register(name, email, password, role);
+      // Auth context will update user state and trigger useEffect above
+    } catch (err) {
+      console.error('Registration failed:', err);
+      // You can show an error message to the user here
     }
   };
 
@@ -64,6 +89,7 @@ function App() {
   };
 
   const handleSignOut = () => {
+    logout();
     setSignedIn(false);
     setRole('');
     setCurrentPage('home');
@@ -81,13 +107,25 @@ function App() {
   if (signedIn && role === 'Teacher') {
     return <TeacherDashboard onSignOut={handleSignOut} />;
   }
-  if (signedIn && role === 'Administrator') {
-    return (
-      <>
-        <AdminDashboard onSignOut={handleSignOut} />
-        <SecurityAudit />
-      </>
-    );
+  // Render appropriate dashboard based on role
+  if (signedIn) {
+    if (role === 'Administrator') {
+      return (
+        <>
+          <AdminDashboard onSignOut={handleSignOut} />
+          <SecurityAudit />
+        </>
+      );
+    } else if (role === 'Teacher') {
+      return <TeacherDashboard onSignOut={handleSignOut} />;
+    } else if (role === 'Parent') {
+      return <ParentDashboard onSignOut={handleSignOut} />;
+    }
+  }
+
+  // Render HomePage if not on auth or dashboard page
+  if (currentPage === 'home') {
+    return <HomePage onNavigateToAuth={() => setCurrentPage('auth')} />;
   }
 
   // Render authentication page
@@ -128,11 +166,21 @@ function App() {
         {activeTab === 'signin' ? (
           <form className="auth-form" onSubmit={handleSignIn}>
             <label>Email Address</label>
-            <input type="email" placeholder="Enter your institutional email" required />
+            <input 
+              type="email"
+              name="email"
+              placeholder="Enter your institutional email"
+              required
+            />
             
             <label>Password</label>
             <div className="auth-password">
-              <input type="password" placeholder="Enter your password" required />
+              <input 
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+              />
               <span className="auth-eye">👁️</span>
             </div>
             
@@ -179,7 +227,15 @@ function App() {
               <label htmlFor="remember">Remember my credentials on this device</label>
             </div>
             
-            <button type="submit" className="auth-btn">Sign In to GuardianLink →</button>
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In to GuardianLink →'}
+            </button>
+            
+            {error && (
+              <div className="auth-error" style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>
+                {error}
+              </div>
+            )}
             
             <div className="auth-demo">
               <b>Demo Mode:</b>
@@ -188,7 +244,7 @@ function App() {
             </div>
             
             <div className="auth-footer">
-              <a href="#" style={{color: '#6366f1'}}>Forgot Password?</a>
+              <button onClick={(e) => { e.preventDefault(); /* Add forgot password handler */ }} style={{color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>Forgot Password?</button>
               <span style={{margin: '0 8px'}}> | </span>
               <span style={{color: '#888'}}>Need help? Contact IT Support</span>
             </div>
@@ -196,20 +252,40 @@ function App() {
         ) : (
           <form className="auth-form" onSubmit={handleSignUp}>
             <label>Full Name</label>
-            <input type="text" placeholder="Enter your full name" required />
+            <input 
+              type="text"
+              name="name"
+              placeholder="Enter your full name"
+              required 
+            />
             
             <label>Email Address</label>
-            <input type="email" placeholder="Enter your institutional email" required />
+            <input 
+              type="email"
+              name="email"
+              placeholder="Enter your institutional email"
+              required 
+            />
             
             <label>Password</label>
             <div className="auth-password">
-              <input type="password" placeholder="Create a password" required />
+              <input 
+                type="password"
+                name="password"
+                placeholder="Create a password"
+                required 
+              />
               <span className="auth-eye">👁️</span>
             </div>
             
             <label>Confirm Password</label>
             <div className="auth-password">
-              <input type="password" placeholder="Confirm your password" required />
+              <input 
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm your password"
+                required 
+              />
               <span className="auth-eye">👁️</span>
             </div>
             
@@ -254,11 +330,19 @@ function App() {
             <div className="auth-terms">
               <input type="checkbox" id="terms" required />
               <label htmlFor="terms">
-                I agree to the <a href="#terms" style={{color: '#6366f1'}}>Terms of Service</a> and <a href="#privacy" style={{color: '#6366f1'}}>Privacy Policy</a>
+                I agree to the <button onClick={(e) => { e.preventDefault(); /* Add terms handler */ }} style={{color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>Terms of Service</button> and <button onClick={(e) => { e.preventDefault(); /* Add privacy handler */ }} style={{color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>Privacy Policy</button>
               </label>
             </div>
             
-            <button type="submit" className="auth-btn">Create Account →</button>
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? 'Creating Account...' : 'Create Account →'}
+            </button>
+            
+            {error && (
+              <div className="auth-error" style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>
+                {error}
+              </div>
+            )}
             
             <div className="auth-demo">
               <b>Demo Registration:</b>
