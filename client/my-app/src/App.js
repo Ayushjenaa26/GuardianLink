@@ -9,19 +9,19 @@ import { useAuth } from './context/AuthContext';
 
 const roles = [
   { 
-    value: 'Parent',
+    value: 'parent',
     label: 'Parent',
     description: "Monitor your child's academic progress",
     icon: <span style={{fontSize: '1.5rem', color: '#2563eb'}}>👨‍👩‍👧‍👦</span>
   },
   {
-    value: 'Teacher',
+    value: 'teacher',
     label: 'Teacher',
     description: "Manage classes and student records",
     icon: <span style={{fontSize: '1.5rem', color: '#22c55e'}}>🧑‍🏫</span>
   },
   {
-    value: 'Administrator',
+    value: 'admin',
     label: 'Administrator',
     description: "System management and oversight",
     icon: <span style={{fontSize: '1.5rem', color: '#a855f7'}}>🛡️</span>
@@ -85,7 +85,12 @@ function App() {
     }
 
     try {
-      await register(name, email, password, role);
+      const result = await register(name, email, password, role);
+      if (result && result.user) {
+        setSignedIn(true);
+        setRole(result.user.role);
+        setCurrentPage('dashboard');
+      }
     } catch (err) {
       console.error('Registration failed:', err);
     }
@@ -116,12 +121,12 @@ function App() {
 
   // Render dashboards if signed in
   if (signedIn && user) {
-    switch (user.role) {
-      case 'Parent':
+    switch (user.role.toLowerCase()) {
+      case 'parent':
         return <ParentDashboard user={user} onSignOut={handleSignOut} />;
-      case 'Teacher':
+      case 'teacher':
         return <TeacherDashboard user={user} onSignOut={handleSignOut} />;
-      case 'Administrator':
+      case 'admin':
         return <AdminDashboard user={user} onSignOut={handleSignOut} />;
       default:
         return <HomePage onNavigateToAuth={handleGoToAuth} />;
