@@ -1,0 +1,242 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #0A0F1C;
+  padding: 20px;
+}
+
+.auth-box {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  margin: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 40px);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-title {
+  font-size: 24px;
+  color: #6C63FF;
+  margin: 0;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.powered-by {
+  color: #666;
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #E0E0E0;
+  gap: 48px;
+  justify-content: center;
+}
+
+.tab-button {
+  padding: 12px 0;
+  font-size: 15px;
+  background: none;
+  border: none;
+  color: #757575;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-width: 64px;
+}
+
+.tab-button.active {
+  color: #6C63FF;
+  font-weight: 500;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #6C63FF;
+}
+
+.error-message {
+  background-color: #fff3f3;
+  color: #d32f2f;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #424242;
+  font-weight: 500;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  padding: 12px;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #F5F5F5;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+  color: #9E9E9E;
+}
+
+.form-group input:focus {
+  border-color: #6C63FF;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+.role-selection {
+  margin-top: 8px;
+}
+
+.role-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.role-option:hover {
+  border-color: #6C63FF;
+  background-color: #F8F7FF;
+}
+
+.role-option.selected {
+  border-color: #6C63FF;
+  background-color: #F8F7FF;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+.role-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background-color: #F4F3FF;
+  border-radius: 6px;
+  color: #6C63FF;
+}
+
+.role-info {
+  flex: 1;
+}
+
+.role-info h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #424242;
+  font-weight: 500;
+}
+
+.role-info p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #757575;
+  line-height: 1.4;
+}
+
+.remember-me {
+  margin: 24px 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  color: #666;
+  font-size: 13px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #E0E0E0;
+  border-radius: 4px;
+  cursor: pointer;
+  accent-color: #6C63FF;
+}
+
+.submit-button {
+  background-color: #6C63FF;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  height: 44px;
+  margin-top: 4px;
+}
+
+.submit-button:hover {
+  background-color: #5B53E0;
+  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.2);
+}
+
+.submit-button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.submit-button:disabled {
+  background-color: #E0E0E0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

@@ -36,4 +36,11 @@ router.post(
 // @access  Private
 router.get('/me', auth, authController.getCurrentUser);
 
+// @route   GET /api/auth/verify
+// @desc    Verify token and return basic user info
+// @access  Private
+router.get('/verify', auth, (req, res) => {
+    res.json({ success: true, user: req.user });
+});
+
 module.exports = router;

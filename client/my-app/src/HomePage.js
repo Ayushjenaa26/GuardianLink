@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
-const HomePage = ({ onNavigateToAuth }) => {
+const HomePage = () => {
   const [activeSection, setActiveSection] = useState('hero');
+  const navigate = useNavigate();
+
+  const handleNavigateToAuth = () => {
+    navigate('/auth');
+  };
 
   return (
     <div className="homepage">
@@ -20,8 +26,8 @@ const HomePage = ({ onNavigateToAuth }) => {
             <a href="#contact" onClick={() => setActiveSection('contact')}>Contact</a>
           </div>
           <div className="nav-auth">
-            <button className="btn-signin" onClick={onNavigateToAuth}>Sign In</button>
-            <button className="btn-signup" onClick={onNavigateToAuth}>Sign Up</button>
+            <button className="btn-signin" onClick={handleNavigateToAuth}>Sign In</button>
+            <button className="btn-signup" onClick={handleNavigateToAuth}>Sign Up</button>
           </div>
         </div>
       </nav>
@@ -62,7 +68,7 @@ const HomePage = ({ onNavigateToAuth }) => {
               </div>
             </div>
             <div className="hero-actions">
-              <button className="btn-primary" onClick={onNavigateToAuth}>Get Started</button>
+              <button className="btn-primary" onClick={handleNavigateToAuth}>Get Started</button>
               <button className="btn-secondary">Watch Demo</button>
             </div>
           </div>
@@ -155,7 +161,7 @@ const HomePage = ({ onNavigateToAuth }) => {
                 <li>Report behavioral observations</li>
                 <li>Class performance analytics</li>
               </ul>
-              <button className="feature-cta" onClick={onNavigateToAuth}>Access Portal</button>
+              <button className="feature-cta" onClick={handleNavigateToAuth}>Access Portal</button>
             </div>
             <div className="feature-card">
               <div className="feature-icon">⚙️</div>
@@ -166,7 +172,7 @@ const HomePage = ({ onNavigateToAuth }) => {
                 <li>Complete data oversight</li>
                 <li>Institution management</li>
               </ul>
-              <button className="feature-cta" onClick={onNavigateToAuth}>Access Portal</button>
+              <button className="feature-cta" onClick={handleNavigateToAuth}>Access Portal</button>
             </div>
             <div className="feature-card">
               <div className="feature-icon">👨‍👩‍👧‍👦</div>
@@ -177,7 +183,7 @@ const HomePage = ({ onNavigateToAuth }) => {
                 <li>Fee status and payment history</li>
                 <li>Behavior reports and feedback</li>
               </ul>
-              <button className="feature-cta" onClick={onNavigateToAuth}>Access Portal</button>
+              <button className="feature-cta" onClick={handleNavigateToAuth}>Access Portal</button>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🔔</div>
@@ -188,7 +194,7 @@ const HomePage = ({ onNavigateToAuth }) => {
                 <li>Customizable alert preferences</li>
                 <li>Multi-channel communication</li>
               </ul>
-              <button className="feature-cta" onClick={onNavigateToAuth}>Learn More</button>
+              <button className="feature-cta" onClick={handleNavigateToAuth}>Learn More</button>
             </div>
             <div className="feature-card">
               <div className="feature-icon">📊</div>
@@ -199,7 +205,7 @@ const HomePage = ({ onNavigateToAuth }) => {
                 <li>Attendance analytics</li>
                 <li>Performance trends</li>
               </ul>
-              <button className="feature-cta" onClick={onNavigateToAuth}>View Demo</button>
+              <button className="feature-cta" onClick={handleNavigateToAuth}>View Demo</button>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🔒</div>
@@ -210,7 +216,7 @@ const HomePage = ({ onNavigateToAuth }) => {
                 <li>Data encryption</li>
                 <li>Secure authentication</li>
               </ul>
-              <button className="feature-cta" onClick={onNavigateToAuth}>Learn More</button>
+              <button className="feature-cta" onClick={handleNavigateToAuth}>Learn More</button>
             </div>
           </div>
         </div>
@@ -254,7 +260,7 @@ const HomePage = ({ onNavigateToAuth }) => {
             </div>
           </div>
           <div className="workflow-cta">
-            <button className="btn-primary large" onClick={onNavigateToAuth}>Start Using GuardianLink</button>
+            <button className="btn-primary large" onClick={handleNavigateToAuth}>Start Using GuardianLink</button>
           </div>
         </div>
       </section>
@@ -266,12 +272,12 @@ const HomePage = ({ onNavigateToAuth }) => {
             <h2>Ready to Transform Parent-Teacher Communication?</h2>
             <p>Join institutions that trust GuardianLink for transparent, verified educational updates</p>
             <div className="cta-actions">
-              <button className="btn-primary large" onClick={onNavigateToAuth}>Start Free Trial</button>
+              <button className="btn-primary large" onClick={handleNavigateToAuth}>Start Free Trial</button>
               <button className="btn-secondary large">Schedule Demo</button>
             </div>
             <div className="cta-note">
               <span>Already have an account? </span>
-              <button className="text-link" onClick={onNavigateToAuth}>Sign in here</button>
+              <button className="text-link" onClick={handleNavigateToAuth}>Sign in here</button>
             </div>
           </div>
         </div>
@@ -288,8 +294,8 @@ const HomePage = ({ onNavigateToAuth }) => {
               </div>
               <p>Direct institution-to-parent communication platform for transparent educational updates.</p>
               <div className="footer-auth">
-                <button className="btn-signin" onClick={onNavigateToAuth}>Sign In</button>
-                <button className="btn-signup" onClick={onNavigateToAuth}>Sign Up</button>
+                <button className="btn-signin" onClick={handleNavigateToAuth}>Sign In</button>
+                <button className="btn-signup" onClick={handleNavigateToAuth}>Sign Up</button>
               </div>
             </div>
             <div className="footer-section">

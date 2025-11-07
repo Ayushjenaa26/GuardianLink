@@ -38,9 +38,24 @@ const studentSchema = new mongoose.Schema({
         required: [true, 'Admission number is required'],
         unique: true
     },
-    parent: {
+    parentName: {
+        type: String,
+        required: [true, 'Parent name is required'],
+        trim: true
+    },
+    parentPhone: {
+        type: String,
+        required: [true, 'Parent phone number is required'],
+        trim: true
+    },
+    healthInfo: {
+        type: String,
+        trim: true
+    },
+    createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Parent'
+        ref: 'Teacher',
+        required: true
     }
 }, {
     timestamps: true

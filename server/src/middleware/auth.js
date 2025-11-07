@@ -18,18 +18,21 @@ module.exports = async (req, res, next) => {
 
         // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+
+        // Support tokens signed as either { user: { ... } } or flat { id, role, ... }
+        const payload = decoded.user ? decoded.user : decoded;
+
         // Find user based on role
         let user;
-        switch (decoded.user.role) {
+        switch (payload.role) {
             case 'teacher':
-                user = await Teacher.findById(decoded.user.id);
+                user = await Teacher.findById(payload.id);
                 break;
             case 'student':
-                user = await Student.findById(decoded.user.id);
+                user = await Student.findById(payload.id);
                 break;
             case 'admin':
-                user = await Admin.findById(decoded.user.id);
+                user = await Admin.findById(payload.id);
                 break;
             default:
                 throw new Error('Invalid user role');
@@ -42,7 +45,7 @@ module.exports = async (req, res, next) => {
         // Add user info to request
         req.user = {
             id: user._id,
-            role: decoded.user.role,
+            role: payload.role,
             name: user.name,
             email: user.email
         };

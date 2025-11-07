@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 import './StudentDataInput.css';
 
 const StudentDataInput = () => {
@@ -43,37 +44,40 @@ const StudentDataInput = () => {
   const [errors, setErrors] = useState({});
   const [profileImage, setProfileImage] = useState(null);
 
-  // Sample recent entries for preview
-  const recentEntries = [
-    {
-      id: 'S1001',
-      name: 'Emily Johnson',
-      batch: 'B1 - Full Stack',
-      date: '2 hours ago',
-      initials: 'EJ'
-    },
-    {
-      id: 'S1002',
-      name: 'Michael Rodriguez',
-      batch: 'B2 - Software Eng',
-      date: '4 hours ago',
-      initials: 'MR'
-    },
-    {
-      id: 'S1003',
-      name: 'Sarah Chen',
-      batch: 'B1 - Full Stack',
-      date: '1 day ago',
-      initials: 'SC'
-    },
-    {
-      id: 'S1004',
-      name: 'David Wilson',
-      batch: 'B3 - Database',
-      date: '2 days ago',
-      initials: 'DW'
-    }
-  ];
+  // State for recent entries
+  const [recentEntries, setRecentEntries] = useState([]);
+
+  // Fetch recent entries when component mounts
+  React.useEffect(() => {
+    const fetchRecentEntries = async () => {
+      try {
+        const response = await fetch(`${API_URL}/teacher/students?limit=4`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch recent entries');
+        }
+
+        const data = await response.json();
+        const formattedEntries = data.map(student => ({
+          id: student.studentId,
+          name: `${student.firstName} ${student.lastName}`,
+          batch: student.batch,
+          date: new Date(student.createdAt).toLocaleDateString(),
+          initials: `${student.firstName[0]}${student.lastName[0]}`
+        }));
+        setRecentEntries(formattedEntries);
+      } catch (error) {
+        console.error('Error fetching recent entries:', error);
+      }
+    };
+
+    fetchRecentEntries();
+  }, []);
 
   const batches = [
     'B1 - Full Stack Development',
@@ -97,6 +101,10 @@ const StudentDataInput = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    // Clear error for the field being edited
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -117,19 +125,25 @@ const StudentDataInput = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Required field validation
+    // Required field validation matching backend requirements
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.studentId.trim()) newErrors.studentId = 'Student ID is required';
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
-    if (!formData.gender) newErrors.gender = 'Gender is required';
-    if (!formData.batch) newErrors.batch = 'Batch selection is required';
-    if (!formData.department) newErrors.department = 'Department is required';
+    if (!formData.studentId.trim()) {
+      newErrors.studentId = 'Student ID is required (will be used as initial password)';
+    } else if (formData.studentId.length < 6) {
+      newErrors.studentId = 'Student ID must be at least 6 characters (will be used as initial password)';
+    }
 
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
+
+    if (!formData.batch) newErrors.batch = 'Class/Batch is required';
+    if (!formData.department) newErrors.department = 'Section/Department is required';
+    if (!formData.parentName) newErrors.parentName = 'Parent name is required';
+    if (!formData.parentPhone) newErrors.parentPhone = 'Parent phone number is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -144,14 +158,86 @@ const StudentDataInput = () => {
 
     setIsSubmitting(true);
 
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Form submitted:', formData);
+      // Create the student data object
+      const studentData = {
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: formData.email.trim(),
+        password: formData.studentId.trim(),
+        class: formData.batch,
+        section: formData.department,
+        admissionNumber: formData.studentId.trim(),
+        parentName: formData.parentName.trim(),
+        parentPhone: formData.parentPhone.trim(),
+        healthInfo: formData.specialNeeds ? formData.specialNeeds.trim() : ''
+      };
+
+      // Validate required fields again just to be safe
+      const requiredFields = ['name', 'email', 'password', 'class', 'section', 'admissionNumber', 'parentName', 'parentPhone'];
+      for (const field of requiredFields) {
+        if (!studentData[field]) {
+          throw new Error(`${field} is required`);
+        }
+      }
+
+      // Password length check
+      if (studentData.password.length < 6) {
+        throw new Error('Password (Student ID) must be at least 6 characters');
+      }
+
+      // Email format check
+      if (!/\S+@\S+\.\S+/.test(studentData.email)) {
+        throw new Error('Invalid email format');
+      }
+
+      console.log('Sending student data:', studentData);
+
+  // Use configured API_URL (imported at top) to ensure client talks to backend
+  const response = await fetch(`${API_URL}/teacher/students`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(studentData)
+      });
+
+      let responseData;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        responseData = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(text || 'Failed to create student');
+      }
+
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Failed to create student');
+      }
+
+      console.log('Student created successfully:', responseData);
+      
+      // Update recent entries with the new student
+      setRecentEntries(prev => [{
+        id: studentData.admissionNumber,
+        name: studentData.name,
+        batch: studentData.class,
+        date: 'Just now',
+        initials: `${formData.firstName[0]}${formData.lastName[0]}`
+      }, ...prev.slice(0, 3)]);
+      
       setShowSuccessModal(true);
       resetForm();
     } catch (error) {
       console.error('Error submitting form:', error);
+      const errorMessage = error.message || 'Failed to create student. Please try again.';
+      setErrors(prev => ({
+        ...prev,
+        submit: errorMessage
+      }));
+      // Show error in UI
+      alert(`Error: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }

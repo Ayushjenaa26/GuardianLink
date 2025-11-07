@@ -1,8 +1,69 @@
 const express = require('express');
 const router = express.Router();
+const authMiddleware = require('../../middleware/TeacherSide/auth');
+const studentController = require('../../controllers/TeacherSide/StudentController');
+const dashboardController = require('../../controllers/TeacherSide/dashboardController');
 const { check } = require('express-validator');
-const teacherAuth = require('../../middleware/TeacherSide/auth');
+const Student = require('../../models/Student');
 
+// Dashboard Route
+router.get('/dashboard', authMiddleware, dashboardController.getDashboardData);
+
+// Student Management Routes
+router.post('/students', [
+    authMiddleware,
+    [
+        check('name', 'Name is required').notEmpty(),
+        check('email', 'Please include a valid email').isEmail(),
+        check('password', 'Password must be at least 6 characters long').isLength({ min: 6 }),
+        check('class', 'Class is required').notEmpty(),
+        check('section', 'Section is required').notEmpty(),
+        check('admissionNumber', 'Admission number is required').notEmpty(),
+        check('parentName', 'Parent name is required').notEmpty(),
+        check('parentPhone', 'Parent phone number is required').notEmpty()
+    ]
+], studentController.createStudent);
+router.get('/students', authMiddleware, async (req, res) => {
+    try {
+        const students = await Student.find({}).sort({ createdAt: -1 }).limit(req.query.limit ? parseInt(req.query.limit) : 10);
+        res.json(students);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+router.get('/students/:id', authMiddleware, async (req, res) => {
+    try {
+        const student = await Student.findById(req.params.id);
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+        res.json(student);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+router.put('/students/:id', authMiddleware, async (req, res) => {
+    try {
+        const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+        res.json(student);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+router.delete('/students/:id', authMiddleware, async (req, res) => {
+    try {
+        const student = await Student.findByIdAndDelete(req.params.id);
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+        res.json({ message: 'Student deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 // Import controllers
 const attendanceController = require('../../controllers/TeacherSide/AttendanceController');
 const behaviorController = require('../../controllers/TeacherSide/behaviorController');
@@ -10,7 +71,7 @@ const marksController = require('../../controllers/TeacherSide/MarksController')
 
 // Attendance routes
 router.post('/attendance', [
-  teacherAuth,
+  authMiddleware,
   [
     check('studentId', 'Student ID is required').not().isEmpty(),
     check('status', 'Status must be present, absent, or late').isIn(['present', 'absent', 'late']),
@@ -18,13 +79,13 @@ router.post('/attendance', [
   ]
 ], attendanceController.markAttendance);
 
-router.get('/attendance', teacherAuth, attendanceController.getClassAttendance);
-router.put('/attendance/:attendanceId', teacherAuth, attendanceController.updateAttendance);
-router.get('/attendance/stats', teacherAuth, attendanceController.getAttendanceStats);
+router.get('/attendance', authMiddleware, attendanceController.getClassAttendance);
+router.put('/attendance/:attendanceId', authMiddleware, attendanceController.updateAttendance);
+router.get('/attendance/stats', authMiddleware, attendanceController.getAttendanceStats);
 
 // Behavior report routes
 router.post('/behavior', [
-  teacherAuth,
+  authMiddleware,
   [
     check('studentId', 'Student ID is required').not().isEmpty(),
     check('behavior', 'Valid behavior status is required').isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor']),
@@ -33,14 +94,14 @@ router.post('/behavior', [
   ]
 ], behaviorController.createBehaviorReport);
 
-router.get('/behavior/student/:studentId', teacherAuth, behaviorController.getStudentBehaviorReports);
-router.put('/behavior/:reportId', teacherAuth, behaviorController.updateBehaviorReport);
-router.delete('/behavior/:reportId', teacherAuth, behaviorController.deleteBehaviorReport);
-router.get('/behavior/stats', teacherAuth, behaviorController.getBehaviorStats);
+router.get('/behavior/student/:studentId', authMiddleware, behaviorController.getStudentBehaviorReports);
+router.put('/behavior/:reportId', authMiddleware, behaviorController.updateBehaviorReport);
+router.delete('/behavior/:reportId', authMiddleware, behaviorController.deleteBehaviorReport);
+router.get('/behavior/stats', authMiddleware, behaviorController.getBehaviorStats);
 
 // Marks routes
 router.post('/marks', [
-  teacherAuth,
+  authMiddleware,
   [
     check('studentId', 'Student ID is required').not().isEmpty(),
     check('subject', 'Subject is required').not().isEmpty(),
@@ -51,9 +112,9 @@ router.post('/marks', [
   ]
 ], marksController.addMarks);
 
-router.get('/marks/student/:studentId', teacherAuth, marksController.getStudentMarks);
-router.put('/marks/:marksId', teacherAuth, marksController.updateMarks);
-router.delete('/marks/:marksId', teacherAuth, marksController.deleteMarks);
-router.get('/marks/stats', teacherAuth, marksController.getClassStats);
+router.get('/marks/student/:studentId', authMiddleware, marksController.getStudentMarks);
+router.put('/marks/:marksId', authMiddleware, marksController.updateMarks);
+router.delete('/marks/:marksId', authMiddleware, marksController.deleteMarks);
+router.get('/marks/stats', authMiddleware, marksController.getClassStats);
 
 module.exports = router;

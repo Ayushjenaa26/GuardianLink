@@ -1,7 +1,8 @@
 // Configuration object that loads values from environment variables
 const config = {
     // API Configuration
-    apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+    apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3000',
+    apiPrefix: '/api',
     
     // Environment
     env: process.env.REACT_APP_ENV || 'development',
@@ -9,6 +10,14 @@ const config = {
     
     // Application Info
     appName: process.env.REACT_APP_NAME || 'GuardianLink',
+
+    // Auth endpoints
+    endpoints: {
+        health: '/api/health',
+        login: '/api/auth/login',
+        register: '/api/auth/register',
+        verify: '/api/auth/verify'
+    }
 };
 
 // Export the API URL separately for backward compatibility

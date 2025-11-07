@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../TeacherSide/TeacherDashboard.css';
 import TeacherReports from './TeacherReports';
 import TeacherAttendance from './TeacherAttendance';
@@ -6,9 +6,49 @@ import MyStudents from './MyStudents';
 import MarksKT from './MarksKt';
 import BehaviorReports from './BehaviorReports';
 import StudentDataInput from './StudentDataInput';
+import { API_URL } from '../config';
 
 function TeacherDashboard() {
   const [activeSection, setActiveSection] = useState('dashboard');
+  const [dashboardData, setDashboardData] = useState({
+    totalStudents: 0,
+    totalClasses: 0,
+    pendingReviews: 0,
+    averageAttendance: 0,
+    nextClass: '',
+    nextClassTime: ''
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/teacher/dashboard`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch dashboard data');
+        }
+
+        const data = await response.json();
+        setDashboardData(data);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (activeSection === 'dashboard') {
+      fetchDashboardData();
+    }
+  }, [activeSection]);
 
   const renderSectionContent = () => {
     switch (activeSection) {
@@ -27,26 +67,34 @@ function TeacherDashboard() {
             </header>
             
             <section className="parent-cards">
-              <div className="parent-card card-blue">
-                <div>📚 My Classes</div>
-                <div className="parent-card-value">6</div>
-                <div className="parent-card-desc">Total students: 180 across all sections</div>
-              </div>
-              <div className="parent-card card-yellow">
-                <div>🕒 Today's Schedule</div>
-                <div className="parent-card-value">4</div>
-                <div className="parent-card-desc">Next: Full Stack Lab at 10:00 AM</div>
-              </div>
-              <div className="parent-card card-red">
-                <div>📝 Pending Reviews</div>
-                <div className="parent-card-value">12</div>
-                <div className="parent-card-desc">Lab reports awaiting grading</div>
-              </div>
-              <div className="parent-card card-green">
-                <div>✅ Average Attendance</div>
-                <div className="parent-card-value">94%</div>
-                <div className="parent-card-desc">Excellent class participation</div>
-              </div>
+              {loading ? (
+                <div className="loading-message">Loading dashboard data...</div>
+              ) : error ? (
+                <div className="error-message">{error}</div>
+              ) : (
+                <>
+                  <div className="parent-card card-blue">
+                    <div>📚 My Classes</div>
+                    <div className="parent-card-value">{dashboardData.totalClasses}</div>
+                    <div className="parent-card-desc">Total students: {dashboardData.totalStudents} across all sections</div>
+                  </div>
+                  <div className="parent-card card-yellow">
+                    <div>🕒 Today's Schedule</div>
+                    <div className="parent-card-value">{dashboardData.totalClasses}</div>
+                    <div className="parent-card-desc">Next: {dashboardData.nextClass} at {dashboardData.nextClassTime}</div>
+                  </div>
+                  <div className="parent-card card-red">
+                    <div>📝 Pending Reviews</div>
+                    <div className="parent-card-value">{dashboardData.pendingReviews}</div>
+                    <div className="parent-card-desc">Assignments awaiting review</div>
+                  </div>
+                  <div className="parent-card card-green">
+                    <div>✅ Average Attendance</div>
+                    <div className="parent-card-value">{dashboardData.averageAttendance}%</div>
+                    <div className="parent-card-desc">Class participation rate</div>
+                  </div>
+                </>
+              )}
             </section>
             
             <section className="parent-activity">
