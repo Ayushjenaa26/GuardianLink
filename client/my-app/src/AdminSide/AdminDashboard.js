@@ -10,6 +10,26 @@ function AdminDashboard({ onSignOut }) {
   const [activeSection, setActiveSection] = useState('students');
   const navigate = useNavigate();
 
+  // Get admin info from localStorage
+  const getAdminInfo = () => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        return {
+          name: user.name || 'Administrator',
+          email: user.email || '',
+          role: user.role || 'admin'
+        };
+      }
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+    }
+    return { name: 'Administrator', email: '', role: 'admin' };
+  };
+
+  const adminInfo = getAdminInfo();
+
   const handleSignOut = () => {
     // Clear authentication data
     localStorage.removeItem('token');
@@ -31,7 +51,7 @@ function AdminDashboard({ onSignOut }) {
         <header className="parent-header">
           <div>
             <h2>Admin Dashboard</h2>
-            <span className="parent-welcome">Welcome back, manage your admin dashboard</span>
+            <span className="parent-welcome">Welcome back, {adminInfo.name}! Manage school operations</span>
           </div>
         </header>
 
@@ -156,8 +176,8 @@ function AdminDashboard({ onSignOut }) {
             <span role="img" aria-label="admin">🛡️</span>
           </div>
           <div>
-            <div>Admin User</div>
-            <div className="parent-user-role" style={{color:'#b91c1c'}}>Admin</div>
+            <div>{adminInfo.name}</div>
+            <div className="parent-user-role" style={{color:'#b91c1c'}}>{adminInfo.email || 'Administrator'}</div>
           </div>
         </div>
         <button className="parent-signout" onClick={handleSignOut}>↩ Sign Out</button>

@@ -23,6 +23,26 @@ function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Get teacher info from localStorage
+  const getTeacherInfo = () => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        return {
+          name: user.name || 'Professor',
+          email: user.email || '',
+          role: user.role || 'teacher'
+        };
+      }
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+    }
+    return { name: 'Professor', email: '', role: 'teacher' };
+  };
+
+  const teacherInfo = getTeacherInfo();
+
   const handleSignOut = () => {
     // Clear authentication data
     localStorage.removeItem('token');
@@ -69,7 +89,7 @@ function TeacherDashboard() {
             <header className="parent-header">
               <div>
                 <h2>🎯 Teacher Dashboard</h2>
-                <span className="parent-welcome">Welcome back, Professor! Manage your classes and track student progress</span>
+                <span className="parent-welcome">Welcome back, {teacherInfo.name}! Manage your classes and track student progress</span>
               </div>
             </header>
             
@@ -224,7 +244,7 @@ function TeacherDashboard() {
             <header className="parent-header">
               <div>
                 <h2>🎯 Teacher Dashboard</h2>
-                <span className="parent-welcome">Welcome back, Professor!</span>
+                <span className="parent-welcome">Welcome back, {teacherInfo.name}!</span>
               </div>
             </header>
           </div>
@@ -306,8 +326,8 @@ function TeacherDashboard() {
                 <span>👨‍🏫</span>
               </div>
               <div>
-                <div>Prof. Swapnil P</div>
-                <div className="parent-user-role">Senior Faculty</div>
+                <div>{teacherInfo.name}</div>
+                <div className="parent-user-role">{teacherInfo.email || 'Teacher'}</div>
               </div>
             </div>
             

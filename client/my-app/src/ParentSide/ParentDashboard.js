@@ -10,6 +10,26 @@ function ParentDashboard({ onSignOut }) {
   const [activeSection, setActiveSection] = useState('dashboard');
   const navigate = useNavigate();
 
+  // Get parent info from localStorage
+  const getParentInfo = () => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        return {
+          name: user.name || 'Parent',
+          email: user.email || '',
+          role: user.role || 'parent'
+        };
+      }
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+    }
+    return { name: 'Parent', email: '', role: 'parent' };
+  };
+
+  const parentInfo = getParentInfo();
+
   const handleSignOut = () => {
     // Clear authentication data
     localStorage.removeItem('token');
@@ -49,9 +69,8 @@ function ParentDashboard({ onSignOut }) {
         <div className="parent-user">
           <div className="parent-avatar">👤</div>
           <div>
-            <div>Parent User</div>
-            <div className="parent-user-role">Parent</div>
-            <div className="parent-user-id">CS-2025-001</div>
+            <div>{parentInfo.name}</div>
+            <div className="parent-user-role">{parentInfo.email || 'Parent'}</div>
           </div>
         </div>
         <button className="parent-signout" onClick={handleSignOut}>↩ Sign Out</button>
@@ -62,7 +81,7 @@ function ParentDashboard({ onSignOut }) {
             <header className="parent-header">
               <div>
                 <h2>Dashboard</h2>
-                <span className="parent-welcome">Welcome back, manage your parent dashboard</span>
+                <span className="parent-welcome">Welcome back, {parentInfo.name}! Manage your child's progress</span>
               </div>
               <div className="parent-notifications">
                 <span>🔔 Notifications</span>
