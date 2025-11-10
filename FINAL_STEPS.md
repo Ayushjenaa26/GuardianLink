@@ -1,6 +1,7 @@
 # 🚀 Final Steps to Make Your Website Live
 
 ## Your Deployment URLs
+
 - **Frontend**: https://guardianlink-omega.vercel.app/
 - **Backend**: https://guardianlink-wk12.onrender.com
 
@@ -60,16 +61,19 @@ This triggers auto-deployment on both platforms.
 ## ✅ Test Your Live Site (2 minutes)
 
 ### 1. Test Backend
+
 Open: https://guardianlink-wk12.onrender.com/api/health
 
 Should see:
+
 ```json
-{"status":"ok","message":"Server is running"}
+{ "status": "ok", "message": "Server is running" }
 ```
 
-*First load may take 30-50 seconds (Render waking up)*
+_First load may take 30-50 seconds (Render waking up)_
 
 ### 2. Test Frontend
+
 Open: https://guardianlink-omega.vercel.app/
 
 - Page should load
@@ -77,6 +81,7 @@ Open: https://guardianlink-omega.vercel.app/
 - Check for no errors
 
 ### 3. Test Login
+
 - Try Teacher login with real credentials
 - Should connect to database and load dashboard
 
@@ -90,10 +95,10 @@ Once you complete these 3 actions, your GuardianLink app is **LIVE** and fully f
 
 ## 📝 Quick Reference
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| Frontend | https://guardianlink-omega.vercel.app/ | React App |
-| Backend | https://guardianlink-wk12.onrender.com | Express API |
+| Service      | URL                                               | Purpose      |
+| ------------ | ------------------------------------------------- | ------------ |
+| Frontend     | https://guardianlink-omega.vercel.app/            | React App    |
+| Backend      | https://guardianlink-wk12.onrender.com            | Express API  |
 | Health Check | https://guardianlink-wk12.onrender.com/api/health | Test backend |
 
 ---

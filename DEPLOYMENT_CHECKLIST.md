@@ -5,11 +5,13 @@ Use this checklist to track your deployment progress.
 ## Pre-Deployment (Do These First)
 
 - [ ] **MongoDB Atlas Configuration**
+
   - [ ] Whitelist IP `0.0.0.0/0` in Network Access
   - [ ] Test connection string works locally
   - [ ] Copy connection string for later
 
 - [ ] **GitHub Repository**
+
   - [ ] All code committed and pushed to GitHub
   - [ ] Repository is public or linked to Render/Vercel
   - [ ] `.gitignore` includes `.env` files
@@ -23,12 +25,14 @@ Use this checklist to track your deployment progress.
 ## Backend Deployment (Render)
 
 - [ ] **Create Web Service**
+
   - [ ] Sign up/Login to Render.com
   - [ ] Click "New +" → "Web Service"
   - [ ] Connect GitHub repository
   - [ ] Select GuardianLink repo
 
 - [ ] **Configure Service**
+
   - [ ] Name: `guardianlink-backend` (or your choice)
   - [ ] Root Directory: `server`
   - [ ] Environment: `Node`
@@ -36,12 +40,14 @@ Use this checklist to track your deployment progress.
   - [ ] Start Command: `npm start`
 
 - [ ] **Add Environment Variables**
+
   - [ ] `MONGODB_URI` = Your MongoDB Atlas connection string
   - [ ] `JWT_SECRET` = Generated random string
   - [ ] `NODE_ENV` = `production`
   - [ ] `CORS_ORIGIN` = Leave empty for now (update after Vercel)
 
 - [ ] **Deploy Backend**
+
   - [ ] Click "Create Web Service"
   - [ ] Wait for build (2-3 minutes)
   - [ ] Note any build errors in logs
@@ -56,29 +62,34 @@ Use this checklist to track your deployment progress.
 ## Frontend Deployment (Vercel)
 
 - [ ] **Update Production Config**
+
   - [ ] Edit `client/my-app/.env.production`
   - [ ] Set `REACT_APP_API_URL` to your Render backend URL
   - [ ] Commit and push to GitHub
 
 - [ ] **Create Vercel Project**
+
   - [ ] Sign up/Login to Vercel.com
   - [ ] Click "Add New..." → "Project"
   - [ ] Import GuardianLink repository
   - [ ] Select the repo
 
 - [ ] **Configure Project**
+
   - [ ] Framework Preset: Create React App (auto-detected)
   - [ ] Root Directory: `client/my-app`
   - [ ] Build Command: `npm run build` (auto)
   - [ ] Output Directory: `build` (auto)
 
 - [ ] **Add Environment Variables**
+
   - [ ] `REACT_APP_API_URL` = Your Render backend URL
   - [ ] `REACT_APP_ENV` = `production`
   - [ ] `REACT_APP_NAME` = `GuardianLink`
   - [ ] `REACT_APP_DEBUG` = `false`
 
 - [ ] **Deploy Frontend**
+
   - [ ] Click "Deploy"
   - [ ] Wait for build (2-3 minutes)
   - [ ] Note any build errors
@@ -94,6 +105,7 @@ Use this checklist to track your deployment progress.
 ## Post-Deployment Configuration
 
 - [ ] **Update CORS on Render**
+
   - [ ] Go back to Render dashboard
   - [ ] Open your backend service
   - [ ] Environment tab
@@ -114,16 +126,19 @@ Use this checklist to track your deployment progress.
 If you encounter issues, check these:
 
 - [ ] **CORS Errors**
+
   - [ ] Verify `CORS_ORIGIN` on Render matches Vercel URL exactly
   - [ ] No trailing slash in URLs
   - [ ] Check browser console for specific error
 
 - [ ] **API Connection Errors**
+
   - [ ] Verify `REACT_APP_API_URL` on Vercel is correct
   - [ ] Test backend health endpoint directly
   - [ ] Check Render logs for errors
 
 - [ ] **MongoDB Connection Errors**
+
   - [ ] Check MongoDB Atlas Network Access has `0.0.0.0/0`
   - [ ] Verify connection string format
   - [ ] Check Render logs: "Connected to MongoDB" message
@@ -138,11 +153,13 @@ If you encounter issues, check these:
 ## Optional Enhancements
 
 - [ ] **Custom Domain (Optional)**
+
   - [ ] Add custom domain to Vercel
   - [ ] Configure DNS settings
   - [ ] Update CORS_ORIGIN on Render
 
 - [ ] **Monitoring**
+
   - [ ] Enable Vercel Analytics
   - [ ] Set up Render email notifications
   - [ ] Add UptimeRobot for backend ping (prevents sleep)
@@ -171,8 +188,8 @@ Your deployment is successful when:
 
 Write down your URLs here:
 
-- **Frontend (Vercel)**: _________________________________
-- **Backend (Render)**: _________________________________
+- **Frontend (Vercel)**: ****************\_****************
+- **Backend (Render)**: ****************\_****************
 - **MongoDB Atlas**: https://cloud.mongodb.com
 - **GitHub Repo**: https://github.com/Ayushjenaa26/GuardianLink
 

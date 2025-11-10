@@ -43,15 +43,16 @@ git push origin main
 
 In your Render service settings, go to **Environment** tab and add:
 
-| Key | Value | Notes |
-|-----|-------|-------|
-| `MONGODB_URI` | `mongodb+srv://...` | Your MongoDB Atlas connection string |
-| `JWT_SECRET` | Generate a secure random string | Use: `openssl rand -base64 32` |
-| `PORT` | `3004` | Render will override this automatically |
-| `NODE_ENV` | `production` | Sets production mode |
-| `CORS_ORIGIN` | `https://your-vercel-app.vercel.app` | Update after Vercel deployment |
+| Key           | Value                                | Notes                                   |
+| ------------- | ------------------------------------ | --------------------------------------- |
+| `MONGODB_URI` | `mongodb+srv://...`                  | Your MongoDB Atlas connection string    |
+| `JWT_SECRET`  | Generate a secure random string      | Use: `openssl rand -base64 32`          |
+| `PORT`        | `3004`                               | Render will override this automatically |
+| `NODE_ENV`    | `production`                         | Sets production mode                    |
+| `CORS_ORIGIN` | `https://your-vercel-app.vercel.app` | Update after Vercel deployment          |
 
 **To generate a secure JWT_SECRET**, run in PowerShell:
+
 ```powershell
 -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 32 | ForEach-Object {[char]$_})
 ```
@@ -81,6 +82,7 @@ REACT_APP_DEBUG=false
 ```
 
 Commit and push:
+
 ```bash
 git add .
 git commit -m "Update production backend URL"
@@ -103,15 +105,16 @@ git push origin main
    - **Install Command**: `npm install`
 
 5. Add **Environment Variables**:
+
    - Click "Environment Variables" section
    - Add the following:
 
-   | Name | Value |
-   |------|-------|
+   | Name                | Value                                       |
+   | ------------------- | ------------------------------------------- |
    | `REACT_APP_API_URL` | `https://guardianlink-backend.onrender.com` |
-   | `REACT_APP_ENV` | `production` |
-   | `REACT_APP_NAME` | `GuardianLink` |
-   | `REACT_APP_DEBUG` | `false` |
+   | `REACT_APP_ENV`     | `production`                                |
+   | `REACT_APP_NAME`    | `GuardianLink`                              |
+   | `REACT_APP_DEBUG`   | `false`                                     |
 
 6. Click **"Deploy"**
 7. Wait 2-3 minutes for build to complete
@@ -149,6 +152,7 @@ vercel --prod
 ## ✅ Verification
 
 ### Test Backend
+
 ```bash
 # Health check
 curl https://guardianlink-backend.onrender.com/api/health
@@ -157,6 +161,7 @@ curl https://guardianlink-backend.onrender.com/api/health
 ```
 
 ### Test Frontend
+
 1. Visit your Vercel URL: `https://your-project-name.vercel.app`
 2. Try logging in with Teacher credentials
 3. Check browser console for any CORS or API errors
@@ -168,11 +173,13 @@ curl https://guardianlink-backend.onrender.com/api/health
 ### Custom Domain (Optional)
 
 #### Vercel:
+
 1. Go to Project Settings → Domains
 2. Add your custom domain
 3. Follow DNS configuration instructions
 
 #### Render:
+
 1. Go to Service Settings → Custom Domain
 2. Add your domain and configure DNS
 
@@ -181,11 +188,13 @@ curl https://guardianlink-backend.onrender.com/api/health
 If you need to update environment variables:
 
 **Vercel**:
+
 1. Project Settings → Environment Variables
 2. Edit → Save
 3. Go to Deployments → Click ⋯ → Redeploy
 
 **Render**:
+
 1. Service → Environment
 2. Edit values → Save (auto-redeploys)
 
@@ -194,25 +203,33 @@ If you need to update environment variables:
 ## 🐛 Troubleshooting
 
 ### Issue: CORS Error in Browser Console
+
 **Solution**: Ensure `CORS_ORIGIN` on Render matches your Vercel URL exactly (no trailing slash)
 
 ### Issue: API Returns 404
+
 **Solution**: Check that backend is running on Render and URL is correct in frontend `.env.production`
 
 ### Issue: "Cannot connect to database"
+
 **Solution**: Verify MongoDB Atlas connection string in Render environment variables
 
 ### Issue: Render Service Sleeps
+
 **Solution**: Free tier spins down after 15 mins inactivity. Upgrade to paid plan or use a service like UptimeRobot to ping your backend every 10 minutes.
 
 ### Issue: Build Fails on Vercel
-**Solution**: 
+
+**Solution**:
+
 - Check build logs for errors
 - Ensure `client/my-app` is set as root directory
 - Verify all dependencies are in `package.json`
 
 ### Issue: Environment Variables Not Loading
-**Solution**: 
+
+**Solution**:
+
 - Vercel: Variables must start with `REACT_APP_`
 - After adding variables, trigger a new deployment
 - Check Deployment logs to verify variables are set
@@ -222,10 +239,12 @@ If you need to update environment variables:
 ## 📊 Monitoring
 
 ### Vercel Analytics
+
 - Go to your project → Analytics tab
 - View page views, performance metrics
 
 ### Render Logs
+
 - Service Dashboard → Logs tab
 - View real-time server logs
 - Filter by error level
@@ -242,6 +261,7 @@ Both Vercel and Render support automatic deployments:
 4. Changes live in 2-3 minutes
 
 To disable auto-deployment:
+
 - **Vercel**: Project Settings → Git → Disable
 - **Render**: Service Settings → Auto-Deploy → Off
 
@@ -268,6 +288,7 @@ To disable auto-deployment:
 ## 🎉 Success!
 
 Your GuardianLink app should now be live:
+
 - Frontend: `https://your-project-name.vercel.app`
 - Backend: `https://guardianlink-backend.onrender.com`
 

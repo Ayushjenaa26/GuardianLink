@@ -3,9 +3,11 @@
 ### Allow Render/Vercel to Access Your Database
 
 1. **Log in to MongoDB Atlas**
+
    - Go to https://cloud.mongodb.com/
 
 2. **Navigate to Network Access**
+
    - Click "Network Access" in left sidebar
    - Click "Add IP Address"
 
@@ -22,6 +24,7 @@
 If you want to restrict access, add these IP ranges:
 
 **Render IP Ranges** (Free tier uses dynamic IPs):
+
 ```
 3.73.66.50/32
 3.73.66.51/32
@@ -34,11 +37,13 @@ If you want to restrict access, add these IP ranges:
 ### Connection String Format
 
 Make sure your `MONGODB_URI` looks like this:
+
 ```
 mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/<database>?retryWrites=true&w=majority
 ```
 
 Replace:
+
 - `<username>`: Your database username
 - `<password>`: Your database password (URL-encoded if it contains special characters)
 - `<database>`: `guardianlink` (your database name)
@@ -47,6 +52,7 @@ Replace:
 ### Testing Connection
 
 Test your connection string locally before deploying:
+
 ```bash
 cd server
 node -e "const mongoose = require('mongoose'); mongoose.connect('YOUR_CONNECTION_STRING').then(() => console.log('✓ Connected')).catch(err => console.error('✗ Error:', err));"
