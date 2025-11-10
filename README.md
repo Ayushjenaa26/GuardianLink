@@ -22,7 +22,6 @@ Monthly Overview: Detailed attendance records with percentages
 
 Daily Tracking: Real-time attendance updates
 
-Statistics: Present/Absent day counts and trends
 
 🎯 Marks & Grades
 Subject-wise Breakdown: Detailed marks for each subject
