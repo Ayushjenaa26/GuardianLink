@@ -62,18 +62,78 @@ const AuthPage = () => {
     setSuccess(null);
     
     try {
-      // Validation
+      // Basic validation
       if (!email || !password || !role) {
         throw new Error('Please fill in all required fields');
       }
 
-      // For Admin and Parent - Skip API calls, use frontend only
-      if (role === 'admin' || role === 'parent') {
-        // Simple validation
-        if (!isLogin && password !== confirmPassword) {
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Sign Up validations
+      if (!isLogin) {
+        // Name validation
+        if (!name || name.trim().length < 2) {
+          throw new Error('Name must be at least 2 characters long');
+        }
+
+        // Password match validation
+        if (password !== confirmPassword) {
           throw new Error('Passwords do not match');
         }
 
+        // Password strength validation
+        if (password.length < 8) {
+          throw new Error('Password must be at least 8 characters long');
+        }
+        
+        if (!/[A-Z]/.test(password)) {
+          throw new Error('Password must contain at least one uppercase letter');
+        }
+        
+        if (!/[a-z]/.test(password)) {
+          throw new Error('Password must contain at least one lowercase letter');
+        }
+        
+        if (!/[0-9]/.test(password)) {
+          throw new Error('Password must contain at least one number');
+        }
+        
+        if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+          throw new Error('Password must contain at least one special character (!@#$%^&*...)');
+        }
+
+        // Phone number validation
+        if (!phone || phone.trim() === '') {
+          throw new Error('Phone number is required');
+        }
+
+        // Remove any spaces, dashes, or parentheses
+        const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+        
+        if (!/^\d+$/.test(cleanPhone)) {
+          throw new Error('Phone number must contain only digits');
+        }
+        
+        if (cleanPhone.length !== 10) {
+          throw new Error('Phone number must be exactly 10 digits');
+        }
+
+        // Role-specific validations
+        if (role === 'teacher' && (!subject || !classes)) {
+          throw new Error('Please fill in subject and classes for teacher registration');
+        }
+
+        if (role === 'parent' && (!childName || !childClass)) {
+          throw new Error('Please fill in child name and class for parent registration');
+        }
+      }
+
+      // For Admin and Parent - Skip API calls, use frontend only
+      if (role === 'admin' || role === 'parent') {
         // Create mock user data
         const mockUser = {
           id: `${role}_${Date.now()}`,
@@ -105,23 +165,6 @@ const AuthPage = () => {
       }
 
       // For Teacher - Continue with API calls
-      if (!isLogin) {
-        if (!name || !email || !password || !confirmPassword) {
-          throw new Error('Please fill in all required fields');
-        }
-        
-        if (password !== confirmPassword) {
-          throw new Error('Passwords do not match');
-        }
-        
-        if (password.length < 6) {
-          throw new Error('Password must be at least 6 characters long');
-        }
-        
-        if (role === 'teacher' && (!subject || !classes || !phone)) {
-          throw new Error('Please fill in subject, classes, and phone number for teacher registration');
-        }
-      }
 
       // Check server availability for teacher
       const serverAvailable = await isServerAvailable();
@@ -337,17 +380,49 @@ const AuthPage = () => {
 
           {/* Sign Up Only: Confirm Password */}
           {!isLogin && (
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
-                required
-              />
-            </div>
+            <>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+              
+              {/* Password Strength Indicator */}
+              {password && (
+                <div style={{
+                  fontSize: '12px',
+                  marginTop: '-12px',
+                  marginBottom: '16px',
+                  padding: '8px 12px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}>
+                  <div style={{ marginBottom: '4px', fontWeight: '600', color: '#a78bfa' }}>Password Requirements:</div>
+                  <div style={{ color: password.length >= 8 ? '#10b981' : '#ef4444' }}>
+                    {password.length >= 8 ? '✓' : '✗'} At least 8 characters
+                  </div>
+                  <div style={{ color: /[A-Z]/.test(password) ? '#10b981' : '#ef4444' }}>
+                    {/[A-Z]/.test(password) ? '✓' : '✗'} One uppercase letter
+                  </div>
+                  <div style={{ color: /[a-z]/.test(password) ? '#10b981' : '#ef4444' }}>
+                    {/[a-z]/.test(password) ? '✓' : '✗'} One lowercase letter
+                  </div>
+                  <div style={{ color: /[0-9]/.test(password) ? '#10b981' : '#ef4444' }}>
+                    {/[0-9]/.test(password) ? '✓' : '✗'} One number
+                  </div>
+                  <div style={{ color: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password) ? '#10b981' : '#ef4444' }}>
+                    {/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password) ? '✓' : '✗'} One special character (!@#$%...)
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           <div className="form-group">
@@ -375,10 +450,34 @@ const AuthPage = () => {
                 type="tel"
                 id="phone"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone number"
+                onChange={(e) => {
+                  // Only allow numbers and limit to 10 digits
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setPhone(value);
+                }}
+                placeholder="Enter 10-digit phone number"
+                maxLength="10"
+                pattern="[0-9]{10}"
                 required
               />
+              {phone && phone.length > 0 && phone.length < 10 && (
+                <div style={{
+                  fontSize: '12px',
+                  color: '#ef4444',
+                  marginTop: '4px'
+                }}>
+                  {phone.length}/10 digits entered
+                </div>
+              )}
+              {phone && phone.length === 10 && (
+                <div style={{
+                  fontSize: '12px',
+                  color: '#10b981',
+                  marginTop: '4px'
+                }}>
+                  ✓ Valid phone number
+                </div>
+              )}
             </div>
           )}
 
