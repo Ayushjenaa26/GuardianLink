@@ -46,36 +46,71 @@ const StudentDataInput = () => {
 
   // State for recent entries
   const [recentEntries, setRecentEntries] = useState([]);
+  const [showAllStudents, setShowAllStudents] = useState(false);
+  const [allStudents, setAllStudents] = useState([]);
+
+  // Fetch recent entries function (can be reused)
+  const fetchRecentEntries = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/teacher/students?limit=4`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch recent entries');
+      }
+
+      const data = await response.json();
+      const formattedEntries = data.map(student => ({
+        id: student.admissionNumber || student.studentId,
+        name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim(),
+        batch: student.class || student.batch,
+        date: new Date(student.createdAt).toLocaleDateString(),
+        initials: student.name ? student.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'ST'
+      }));
+      setRecentEntries(formattedEntries);
+    } catch (error) {
+      console.error('Error fetching recent entries:', error);
+    }
+  };
+
+  // Fetch all students function
+  const fetchAllStudents = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/teacher/students`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch all students');
+      }
+
+      const data = await response.json();
+      const formattedStudents = data.map(student => ({
+        id: student.admissionNumber || student.studentId,
+        name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim(),
+        batch: student.class || student.batch,
+        section: student.section || student.department,
+        email: student.email,
+        date: new Date(student.createdAt).toLocaleDateString(),
+        initials: student.name ? student.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'ST'
+      }));
+      setAllStudents(formattedStudents);
+      setShowAllStudents(true);
+    } catch (error) {
+      console.error('Error fetching all students:', error);
+      alert('Failed to fetch students. Please try again.');
+    }
+  };
 
   // Fetch recent entries when component mounts
   React.useEffect(() => {
-    const fetchRecentEntries = async () => {
-      try {
-        const response = await fetch(`${API_URL}/teacher/students?limit=4`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch recent entries');
-        }
-
-        const data = await response.json();
-        const formattedEntries = data.map(student => ({
-          id: student.studentId,
-          name: `${student.firstName} ${student.lastName}`,
-          batch: student.batch,
-          date: new Date(student.createdAt).toLocaleDateString(),
-          initials: `${student.firstName[0]}${student.lastName[0]}`
-        }));
-        setRecentEntries(formattedEntries);
-      } catch (error) {
-        console.error('Error fetching recent entries:', error);
-      }
-    };
-
     fetchRecentEntries();
   }, []);
 
@@ -125,38 +160,78 @@ const StudentDataInput = () => {
   const validateForm = () => {
     const newErrors = {};
 
+    console.log('🔍 Validating form data:', formData);
+
     // Required field validation matching backend requirements
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.studentId.trim()) {
+    if (!formData.firstName || !formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+      console.log('❌ First name validation failed');
+    }
+    if (!formData.lastName || !formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+      console.log('❌ Last name validation failed');
+    }
+    if (!formData.studentId || !formData.studentId.trim()) {
       newErrors.studentId = 'Student ID is required (will be used as initial password)';
+      console.log('❌ Student ID validation failed');
     } else if (formData.studentId.length < 6) {
       newErrors.studentId = 'Student ID must be at least 6 characters (will be used as initial password)';
+      console.log('❌ Student ID too short');
     }
 
-    if (!formData.email.trim()) {
+    if (!formData.email || !formData.email.trim()) {
       newErrors.email = 'Email is required';
+      console.log('❌ Email validation failed');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
+      console.log('❌ Email format invalid');
     }
 
-    if (!formData.batch) newErrors.batch = 'Class/Batch is required';
-    if (!formData.department) newErrors.department = 'Section/Department is required';
-    if (!formData.parentName) newErrors.parentName = 'Parent name is required';
-    if (!formData.parentPhone) newErrors.parentPhone = 'Parent phone number is required';
+    if (!formData.batch) {
+      newErrors.batch = 'Class/Batch is required';
+      console.log('❌ Batch validation failed');
+    }
+    if (!formData.department) {
+      newErrors.department = 'Section/Department is required';
+      console.log('❌ Department validation failed');
+    }
+    if (!formData.parentName) {
+      newErrors.parentName = 'Parent name is required';
+      console.log('❌ Parent name validation failed');
+    }
+    if (!formData.parentPhone) {
+      newErrors.parentPhone = 'Parent phone number is required';
+      console.log('❌ Parent phone validation failed');
+    }
 
+    console.log('📋 Validation errors:', newErrors);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log(isValid ? '✅ Validation passed!' : '❌ Validation failed!');
+    
+    if (!isValid) {
+      // Show which fields are missing
+      const missingFields = Object.keys(newErrors).join(', ');
+      alert(`Please fill in the following required fields:\n\n${missingFields}`);
+    }
+    
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('Submit button clicked!');
+    alert('Form submitted! Processing...');
+    
     if (!validateForm()) {
+      alert('Validation failed! Please check all required fields.');
       return;
     }
 
     setIsSubmitting(true);
+    console.log('Validation passed, starting submission...');
 
     try {
       // Create the student data object
@@ -190,10 +265,13 @@ const StudentDataInput = () => {
         throw new Error('Invalid email format');
       }
 
-      console.log('Sending student data:', studentData);
+      console.log('🔍 API_URL:', API_URL);
+      console.log('🔍 Token:', localStorage.getItem('token') ? 'Present' : 'Missing');
+      console.log('🔍 Full URL:', `${API_URL}/api/teacher/students`);
+      console.log('📤 Sending student data:', studentData);
 
   // Use configured API_URL (imported at top) to ensure client talks to backend
-  const response = await fetch(`${API_URL}/teacher/students`, {
+  const response = await fetch(`${API_URL}/api/teacher/students`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -203,41 +281,46 @@ const StudentDataInput = () => {
         body: JSON.stringify(studentData)
       });
 
+      console.log('📥 Response status:', response.status, response.statusText);
+
       let responseData;
       const contentType = response.headers.get("content-type");
+      console.log('📥 Content-Type:', contentType);
+      
       if (contentType && contentType.includes("application/json")) {
         responseData = await response.json();
+        console.log('📥 Response data:', responseData);
       } else {
         const text = await response.text();
+        console.log('📥 Response text:', text);
         throw new Error(text || 'Failed to create student');
       }
 
       if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to create student');
+        console.error('❌ Request failed:', responseData);
+        throw new Error(responseData.message || responseData.error || 'Failed to create student');
       }
 
-      console.log('Student created successfully:', responseData);
+      console.log('✅ Student created successfully:', responseData);
       
-      // Update recent entries with the new student
-      setRecentEntries(prev => [{
-        id: studentData.admissionNumber,
-        name: studentData.name,
-        batch: studentData.class,
-        date: 'Just now',
-        initials: `${formData.firstName[0]}${formData.lastName[0]}`
-      }, ...prev.slice(0, 3)]);
+      // Show success alert
+      alert(`✅ Success! Student "${studentData.name}" has been added to the database.`);
+      
+      // Refresh recent entries from the server to show the newly added student
+      await fetchRecentEntries();
       
       setShowSuccessModal(true);
       resetForm();
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('❌ Error submitting form:', error);
+      console.error('❌ Error stack:', error.stack);
       const errorMessage = error.message || 'Failed to create student. Please try again.';
       setErrors(prev => ({
         ...prev,
         submit: errorMessage
       }));
-      // Show error in UI
-      alert(`Error: ${errorMessage}`);
+      // Show error in UI with more details
+      alert(`❌ Error: ${errorMessage}\n\nPlease check the console for more details.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -298,6 +381,21 @@ const StudentDataInput = () => {
         <div className="input-content-grid">
           {/* Main Form */}
           <div className="form-container">
+            {/* Error Display */}
+            {errors.submit && (
+              <div style={{
+                backgroundColor: '#fee',
+                border: '2px solid #f00',
+                padding: '15px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                color: '#c00',
+                fontWeight: 'bold'
+              }}>
+                ❌ Error: {errors.submit}
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit}>
               {/* Personal Information Section */}
               <div className="form-section">
@@ -599,8 +697,11 @@ const StudentDataInput = () => {
                   type="submit" 
                   className={`btn-submit ${isSubmitting ? 'btn-loading' : ''}`}
                   disabled={isSubmitting}
+                  onClick={(e) => {
+                    console.log('Add Student button clicked directly!');
+                  }}
                 >
-                  {isSubmitting ? '' : 'Add Student'}
+                  {isSubmitting ? '⏳ Adding Student...' : '✅ Add Student'}
                 </button>
               </div>
             </form>
@@ -654,40 +755,81 @@ const StudentDataInput = () => {
         {/* Recent Entries */}
         <div className="recent-entries">
           <div className="entries-header">
-            <h3 className="entries-title">Recent Entries</h3>
-            <span className="view-all-btn">View All →</span>
+            <h3 className="entries-title">
+              {showAllStudents ? 'All Students' : 'Recent Entries'}
+            </h3>
+            <span 
+              className="view-all-btn" 
+              onClick={() => {
+                if (showAllStudents) {
+                  setShowAllStudents(false);
+                } else {
+                  fetchAllStudents();
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              {showAllStudents ? '← Back to Recent' : 'View All →'}
+            </span>
           </div>
           <div className="entries-list">
-            {recentEntries.map(entry => (
-              <div key={entry.id} className="entry-item">
-                <div className="entry-avatar">{entry.initials}</div>
-                <div className="entry-info">
-                  <div className="entry-name">{entry.name}</div>
-                  <div className="entry-details">{entry.batch} • {entry.id}</div>
-                </div>
-                <div className="entry-date">{entry.date}</div>
+            {(showAllStudents ? allStudents : recentEntries).length === 0 ? (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '40px 20px', 
+                color: '#666',
+                fontSize: '14px'
+              }}>
+                {showAllStudents ? 'No students found in the database.' : 'No recent entries yet. Add your first student!'}
               </div>
-            ))}
+            ) : (
+              (showAllStudents ? allStudents : recentEntries).map(entry => (
+                <div key={entry.id} className="entry-item">
+                  <div className="entry-avatar">{entry.initials}</div>
+                  <div className="entry-info">
+                    <div className="entry-name">{entry.name}</div>
+                    <div className="entry-details">
+                      {entry.batch} {entry.section ? `• ${entry.section}` : ''} • {entry.id}
+                    </div>
+                  </div>
+                  <div className="entry-date">{entry.date}</div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
 
       {/* Success Modal */}
       {showSuccessModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={() => setShowSuccessModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-icon">🎉</div>
             <h3 className="modal-title">Student Added Successfully!</h3>
             <p className="modal-message">
-              {formData.firstName} {formData.lastName} has been successfully added to the system. 
-              You can now view their profile in the student management section.
+              The student has been successfully added to the system. 
+              You can now view them in the student list below.
             </p>
             <div className="modal-actions">
-              <button className="btn-reset" onClick={() => setShowSuccessModal(false)}>
+              <button 
+                className="btn-reset" 
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  resetForm();
+                }}
+              >
                 Add Another Student
               </button>
-              <button className="btn-submit" onClick={() => setShowSuccessModal(false)}>
-                View Student List
+              <button 
+                className="btn-submit" 
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  fetchAllStudents();
+                  // Scroll to recent entries section
+                  document.querySelector('.recent-entries')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                View All Students
               </button>
             </div>
           </div>

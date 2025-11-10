@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ParentDashboard.css';
 import Reports from './Reports';
 import MarksKTS from './MarksKTS';
@@ -7,6 +8,21 @@ import FeeStatus from './FeeStatus';
 
 function ParentDashboard({ onSignOut }) {
   const [activeSection, setActiveSection] = useState('dashboard');
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Call onSignOut if provided
+    if (onSignOut) {
+      onSignOut();
+    }
+    
+    // Redirect to auth page
+    navigate('/auth');
+  };
   return (
     <div className="parent-layout">
       <aside className="parent-sidebar">
@@ -38,7 +54,7 @@ function ParentDashboard({ onSignOut }) {
             <div className="parent-user-id">CS-2025-001</div>
           </div>
         </div>
-        <button className="parent-signout" onClick={onSignOut ? onSignOut : undefined}>↩ Sign Out</button>
+        <button className="parent-signout" onClick={handleSignOut}>↩ Sign Out</button>
       </aside>
       <main className="parent-main">
         {activeSection === 'dashboard' && (

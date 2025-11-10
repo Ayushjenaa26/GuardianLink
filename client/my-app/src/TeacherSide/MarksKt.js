@@ -33,7 +33,7 @@ const MarksKT = () => {
   const studentsData = [
     {
       id: 'A1001',
-      name: 'Naya',
+      name: 'Atharva Shah',
       attendance: 95,
       assignments: [85, 92, 78, 88, 90],
       exams: [82, 85],
@@ -43,7 +43,7 @@ const MarksKT = () => {
     },
     {
       id: 'A1002',
-      name: 'Ayush',
+      name: 'Atharva More',
       attendance: 88,
       assignments: [92, 95, 90, 88, 94],
       exams: [89, 92],
@@ -53,7 +53,7 @@ const MarksKT = () => {
     },
     {
       id: 'A1003',
-      name: 'Aswin',
+      name: 'Ayush Jena',
       attendance: 92,
       assignments: [78, 82, 75, 80, 85],
       exams: [72, 78],
@@ -63,7 +63,7 @@ const MarksKT = () => {
     },
     {
       id: 'A1004',
-      name: 'Shah',
+      name: 'Dhruv Iyer',
       attendance: 76,
       assignments: [45, 52, 58, 48, 55],
       exams: [42, 48],
@@ -73,7 +73,7 @@ const MarksKT = () => {
     },
     {
       id: 'A1005',
-      name: 'Dhurv',
+      name: 'Drashith Hegde',
       attendance: 94,
       assignments: [88, 85, 90, 87, 89],
       exams: [84, 86],
@@ -83,7 +83,7 @@ const MarksKT = () => {
     },
     {
       id: 'A1006',
-      name: 'Ram',
+      name: 'Aswin Nambiar',
       attendance: 89,
       assignments: [65, 68, 72, 70, 75],
       exams: [62, 65],
@@ -93,7 +93,7 @@ const MarksKT = () => {
     },
     {
       id: 'A1007',
-      name: 'Khari',
+      name: 'Atharva Ranjan',
       attendance: 91,
       assignments: [92, 94, 90, 93, 95],
       exams: [91, 94],
@@ -103,7 +103,7 @@ const MarksKT = () => {
     },
     {
       id: 'A1008',
-      name: 'Ishaan',
+      name: 'Ram Thokane',
       attendance: 83,
       assignments: [55, 58, 52, 60, 56],
       exams: [48, 52],
@@ -117,7 +117,7 @@ const MarksKT = () => {
     'Full Stack Development': {
       averageScore: 76,
       topPerformer: 'Khari (93%)',
-      needsAttention: ['Shah', 'Ishaan', 'Ram'],
+      needsAttention: ['Aswin Nambiar', 'Drashith Hegde', 'Ram Thokane'],
       improvementRate: '+8%',
       ktStudents: 2,
       assignmentCompletion: 94

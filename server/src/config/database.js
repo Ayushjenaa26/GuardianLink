@@ -29,8 +29,6 @@ const connectDB = async (opts = {}) => {
             mongoose.set('strictQuery', true);
             
             const conn = await mongoose.connect(uri, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
                 serverSelectionTimeoutMS: 5000,
                 connectTimeoutMS: 10000,
                 socketTimeoutMS: 45000

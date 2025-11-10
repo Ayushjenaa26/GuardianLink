@@ -13,7 +13,7 @@ router.post(
         check('name', 'Name is required').not().isEmpty(),
         check('email', 'Please include a valid email').isEmail(),
         check('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
-        check('role', 'Role is required').isIn(['student', 'teacher', 'admin'])
+        check('role', 'Role is required').isIn(['student', 'teacher', 'admin', 'parent'])
     ],
     authController.register
 );
@@ -26,7 +26,7 @@ router.post(
     [
         check('email', 'Please include a valid email').isEmail(),
         check('password', 'Password is required').exists(),
-        check('role', 'Role is required').isIn(['student', 'teacher', 'admin'])
+        check('role', 'Role is required').isIn(['student', 'teacher', 'admin', 'parent'])
     ],
     authController.login
 );

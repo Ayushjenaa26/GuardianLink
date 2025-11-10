@@ -1,7 +1,7 @@
 // Configuration object that loads values from environment variables
 const config = {
     // API Configuration
-    apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3000',
+    apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3004',
     apiPrefix: '/api',
     
     // Environment

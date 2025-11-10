@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 import ReportAdmin from './ReportAdmin';
 import StudentAdmin from './StudentAdmin';
@@ -7,6 +8,21 @@ import FeeManagement from './FeeManagement';
 
 function AdminDashboard({ onSignOut }) {
   const [activeSection, setActiveSection] = useState('students');
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Call onSignOut if provided
+    if (onSignOut) {
+      onSignOut();
+    }
+    
+    // Redirect to auth page
+    navigate('/auth');
+  };
 
   // Render the main dashboard content
   const renderDashboardContent = () => {
@@ -22,18 +38,18 @@ function AdminDashboard({ onSignOut }) {
         {/* Dashboard Stats Cards */}
         <section className="parent-cards">
           <div className="parent-card card-blue">
-            <div>Yuei Students</div>
+            <div>Your Students</div>
             <div className="parent-card-value">1,234</div>
             <div className="parent-card-desc">+1% from last month</div>
           </div>
           <div className="parent-card card-green">
-            <div>Yuei Faculty</div>
+            <div>Your Faculty</div>
             <div className="parent-card-value">89</div>
             <div className="parent-card-desc">+2 new this month</div>
           </div>
           <div className="parent-card card-purple">
             <div>Fee Collection</div>
-            <div className="parent-card-value">$12.5L</div>
+            <div className="parent-card-value">Rs 12.5L</div>
             <div className="parent-card-desc">95% collected</div>
           </div>
           <div className="parent-card card-orange">
@@ -144,7 +160,7 @@ function AdminDashboard({ onSignOut }) {
             <div className="parent-user-role" style={{color:'#b91c1c'}}>Admin</div>
           </div>
         </div>
-        <button className="parent-signout" onClick={onSignOut ? onSignOut : undefined}>↩ Sign Out</button>
+        <button className="parent-signout" onClick={handleSignOut}>↩ Sign Out</button>
       </aside>
       
       <main className="parent-main">

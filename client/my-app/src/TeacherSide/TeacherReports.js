@@ -3,31 +3,31 @@ import './TeacherReports.css';
 
 const students = [
   {
-    name: "Emily Johnson", id: "S1001", grades: { fsd: "A", se: "A", cn: "A", db: "A" }, overall: "A (98%)", attendance: "98%", behavior: "Excellent"
+    name: "Atharva Shah", id: "S1001", grades: { fsd: "A", se: "A", cn: "A", db: "A" }, overall: "A (98%)", attendance: "98%", behavior: "Excellent"
   },
   {
-    name: "Michael Rodriguez", id: "S1002", grades: { fsd: "A", se: "A", cn: "A", db: "B" }, overall: "A (96%)", attendance: "96%", behavior: "Good"
+    name: "Atharva More", id: "S1002", grades: { fsd: "A", se: "A", cn: "A", db: "B" }, overall: "A (96%)", attendance: "96%", behavior: "Good"
   },
   {
-    name: "Sarah Chen", id: "S1003", grades: { fsd: "A", se: "A", cn: "B", db: "A" }, overall: "A (95%)", attendance: "97%", behavior: "Good"
+    name: "Ayush Jena", id: "S1003", grades: { fsd: "A", se: "A", cn: "B", db: "A" }, overall: "A (95%)", attendance: "97%", behavior: "Good"
   },
   {
-    name: "David Wilson", id: "S1004", grades: { fsd: "A", se: "B", cn: "A", db: "A" }, overall: "A (94%)", attendance: "95%", behavior: "Good"
+    name: "Dhruv Iyer", id: "S1004", grades: { fsd: "A", se: "B", cn: "A", db: "A" }, overall: "A (94%)", attendance: "95%", behavior: "Good"
   },
   {
-    name: "Amanda Patel", id: "S1005", grades: { fsd: "B", se: "A", cn: "A", db: "B" }, overall: "A (93%)", attendance: "96%", behavior: "Good"
+    name: "Drashith Hegde", id: "S1005", grades: { fsd: "B", se: "A", cn: "A", db: "B" }, overall: "A (93%)", attendance: "96%", behavior: "Good"
   },
   {
-    name: "Thomas Brown", id: "S1006", grades: { fsd: "C", se: "B", cn: "C", db: "B" }, overall: "C (75%)", attendance: "82%", behavior: "Needs Improvement"
+    name: "Aswin Nambiar", id: "S1006", grades: { fsd: "C", se: "B", cn: "C", db: "B" }, overall: "C (75%)", attendance: "82%", behavior: "Needs Improvement"
   }
 ];
 
 const behaviorList = [
-  { initials: "EJ", name: "Emily Johnson", status: "Excellent" },
-  { initials: "MR", name: "Michael Rodriguez", status: "Good" },
-  { initials: "TB", name: "Thomas Brown", status: "Needs Improvement" },
-  { initials: "JK", name: "Jessica Kim", status: "Good" },
-  { initials: "RW", name: "Robert Williams", status: "Concerns" }
+  { initials: "AS", name: "Atharva Shah", status: "Excellent" },
+  { initials: "AM", name: "Atharva More", status: "Good" },
+  { initials: "AJ", name: "Ayush Jena", status: "Needs Improvement" },
+  { initials: "DI", name: "Dhruv Iyer", status: "Good" },
+  { initials: "DH", name: "Drashith Hegde", status: "Concerns" }
 ];
 
 const subjectPerformance = [
@@ -46,11 +46,11 @@ const gradeDist = [
 ];
 
 const topPerformers = [
-  { initials: "EJ", name: "Emily Johnson", percent: "98%" },
-  { initials: "MR", name: "Michael Rodriguez", percent: "96%" },
-  { initials: "SC", name: "Sarah Chen", percent: "95%" },
-  { initials: "DW", name: "David Wilson", percent: "94%" },
-  { initials: "AP", name: "Amanda Patel", percent: "93%" }
+  { initials: "EJ", name: " Atharva Shah", percent: "98%" },
+  { initials: "MR", name: "Atharva More", percent: "96%" },
+  { initials: "SC", name: "Ayush Jen", percent: "95%" },
+  { initials: "DW", name: "Dhruv Iyer", percent: "94%" },
+  { initials: "AP", name: "Drashith Hegde", percent: "93%" }
 ];
 
 function getGradeColor(grade) {

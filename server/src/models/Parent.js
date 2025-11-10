@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const adminSchema = new mongoose.Schema({
+const parentSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Name is required'],
@@ -20,26 +20,31 @@ const adminSchema = new mongoose.Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters long']
     },
+    role: {
+        type: String,
+        default: 'parent',
+        enum: ['parent']
+    },
     phone: {
         type: String,
         required: [true, 'Phone number is required'],
         trim: true
     },
-    role: {
+    childName: {
         type: String,
-        default: 'admin',
-        enum: ['admin']
+        required: [true, 'Child name is required'],
+        trim: true
     },
-    permissions: [{
+    childClass: {
         type: String,
-        enum: ['manage_students', 'manage_teachers', 'manage_parents', 'manage_fees', 'manage_attendance', 'manage_reports', 'manage_security']
-    }]
+        required: [true, 'Child class is required']
+    }
 }, {
     timestamps: true
 });
 
 // Hash password before saving
-adminSchema.pre('save', async function(next) {
+parentSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     
     try {
@@ -52,8 +57,8 @@ adminSchema.pre('save', async function(next) {
 });
 
 // Method to check password
-adminSchema.methods.matchPassword = async function(enteredPassword) {
+parentSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('Admin', adminSchema);
+module.exports = mongoose.model('Parent', parentSchema);

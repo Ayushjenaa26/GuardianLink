@@ -6,6 +6,7 @@ const { validationResult } = require('express-validator');
 const Teacher = require('../models/TeacherSide/Teacher');
 const Student = require('../models/Student');
 const Admin = require('../models/Admin');
+const Parent = require('../models/Parent');
 
 // Login handler
 exports.login = async (req, res) => {
@@ -26,6 +27,9 @@ exports.login = async (req, res) => {
         switch (role.toLowerCase()) {
             case 'teacher':
                 UserModel = Teacher;
+                break;
+            case 'parent':
+                UserModel = Parent;
                 break;
             case 'student':
                 UserModel = Student;
@@ -85,6 +89,11 @@ exports.login = async (req, res) => {
                     subject: user.subject,
                     classes: user.classes
                 }),
+                ...(role.toLowerCase() === 'parent' && {
+                    phone: user.phone,
+                    childName: user.childName,
+                    childClass: user.childClass
+                }),
                 ...(role.toLowerCase() === 'student' && {
                     class: user.class,
                     section: user.section,
@@ -98,6 +107,11 @@ exports.login = async (req, res) => {
 
     } catch (error) {
         console.error('Login error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error during login',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
         res.status(500).json({
             success: false,
             message: 'An error occurred during login'
@@ -124,6 +138,9 @@ exports.register = async (req, res) => {
         switch (role.toLowerCase()) {
             case 'teacher':
                 UserModel = Teacher;
+                break;
+            case 'parent':
+                UserModel = Parent;
                 break;
             case 'student':
                 UserModel = Student;
@@ -180,6 +197,11 @@ exports.register = async (req, res) => {
                 ...(role.toLowerCase() === 'teacher' && {
                     subject: user.subject,
                     classes: user.classes
+                }),
+                ...(role.toLowerCase() === 'parent' && {
+                    phone: user.phone,
+                    childName: user.childName,
+                    childClass: user.childClass
                 }),
                 ...(role.toLowerCase() === 'student' && {
                     class: user.class,

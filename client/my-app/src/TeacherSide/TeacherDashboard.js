@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../TeacherSide/TeacherDashboard.css';
 import TeacherReports from './TeacherReports';
 import TeacherAttendance from './TeacherAttendance';
@@ -9,6 +10,7 @@ import StudentDataInput from './StudentDataInput';
 import { API_URL } from '../config';
 
 function TeacherDashboard() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [dashboardData, setDashboardData] = useState({
     totalStudents: 0,
@@ -21,10 +23,19 @@ function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleSignOut = () => {
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Redirect to auth page
+    navigate('/auth');
+  };
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch(`${API_URL}/teacher/dashboard`, {
+        const response = await fetch(`${API_URL}/api/teacher/dashboard`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
@@ -60,10 +71,6 @@ function TeacherDashboard() {
                 <h2>🎯 Teacher Dashboard</h2>
                 <span className="parent-welcome">Welcome back, Professor! Manage your classes and track student progress</span>
               </div>
-              <div className="parent-notifications">
-                <span>🔔 Notifications</span>
-                <span className="parent-notif-count">3</span>
-              </div>
             </header>
             
             <section className="parent-cards">
@@ -98,24 +105,78 @@ function TeacherDashboard() {
             </section>
             
             <section className="parent-activity">
-              <div className="parent-activity-title">📈 Recent Activity</div>
-              <div className="parent-activity-desc">Stay updated with the latest classroom activities and updates</div>
+              <div className="parent-activity-header">
+                <div>
+                  <div className="parent-activity-title">📈 Recent Activity</div>
+                  <div className="parent-activity-desc">Stay updated with the latest classroom activities and updates</div>
+                </div>
+                <span className="activity-badge">{dashboardData.totalStudents} Students Active</span>
+              </div>
               <div className="parent-activity-list">
-                <div className="parent-activity-item activity-red">
-                  <b>⚠️ Assignment Deadline:</b>
-                  <div>Software Engineering project submission due on January 25, 2025</div>
+                <div className="parent-activity-item activity-success">
+                  <div className="activity-icon">✅</div>
+                  <div className="activity-content">
+                    <div className="activity-header">
+                      <b>Attendance Recorded</b>
+                      <span className="activity-time">2 hours ago</span>
+                    </div>
+                    <div className="activity-description">Class 10A - All 23 students marked present for Computer Science lecture</div>
+                  </div>
                 </div>
-                <div className="parent-activity-item activity-green">
-                  <b>✅ Attendance Recorded:</b>
-                  <div>Full Stack Development Lab - All students marked present today</div>
+
+                <div className="parent-activity-item activity-info">
+                  <div className="activity-icon">📊</div>
+                  <div className="activity-content">
+                    <div className="activity-header">
+                      <b>Grades Updated</b>
+                      <span className="activity-time">5 hours ago</span>
+                    </div>
+                    <div className="activity-description">Mathematics Unit Test results published for Class 10B (23 students)</div>
+                  </div>
                 </div>
-                <div className="parent-activity-item activity-blue">
-                  <b>📊 Grades Published:</b>
-                  <div>Database Management assignment results are now available to students</div>
+
+                <div className="parent-activity-item activity-warning">
+                  <div className="activity-icon">⚠️</div>
+                  <div className="activity-content">
+                    <div className="activity-header">
+                      <b>Assignment Deadline</b>
+                      <span className="activity-time">Tomorrow</span>
+                    </div>
+                    <div className="activity-description">Science project submission due for all sections - 15 students pending</div>
+                  </div>
                 </div>
+
+                <div className="parent-activity-item activity-success">
+                  <div className="activity-icon">🎯</div>
+                  <div className="activity-content">
+                    <div className="activity-header">
+                      <b>Behavior Report Added</b>
+                      <span className="activity-time">Yesterday</span>
+                    </div>
+                    <div className="activity-description">Excellent participation noted for AYUSH JENA in Class 10A</div>
+                  </div>
+                </div>
+
+                <div className="parent-activity-item activity-info">
+                  <div className="activity-icon">📝</div>
+                  <div className="activity-content">
+                    <div className="activity-header">
+                      <b>New Student Added</b>
+                      <span className="activity-time">2 days ago</span>
+                    </div>
+                    <div className="activity-description">TATVA JAIN successfully enrolled in Class 10A, Section A</div>
+                  </div>
+                </div>
+
                 <div className="parent-activity-item activity-purple">
-                  <b>🔄 Schedule Update:</b>
-                  <div>Computer Networks lab rescheduled to 2:00 PM tomorrow</div>
+                  <div className="activity-icon">🔔</div>
+                  <div className="activity-content">
+                    <div className="activity-header">
+                      <b>Class Schedule Update</b>
+                      <span className="activity-time">3 days ago</span>
+                    </div>
+                    <div className="activity-description">English Literature class rescheduled to 2:00 PM for all sections</div>
+                  </div>
                 </div>
               </div>
             </section>
@@ -250,7 +311,7 @@ function TeacherDashboard() {
               </div>
             </div>
             
-            <button className="parent-signout">🚪 Sign Out</button>
+            <button className="parent-signout" onClick={handleSignOut}>🚪 Sign Out</button>
           </div>
         </div>
       </aside>

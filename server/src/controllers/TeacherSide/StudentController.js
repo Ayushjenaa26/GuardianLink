@@ -6,16 +6,24 @@ const { validationResult } = require('express-validator');
 // Add a new student
 exports.createStudent = async (req, res) => {
     try {
-        console.log('Received student creation request:', req.body);
+        console.log('📝 Received student creation request');
+        console.log('📝 Request body:', req.body);
+        console.log('📝 Authenticated user:', req.user);
         
         // Validate request
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            console.log('❌ Validation errors:', errors.array());
+            return res.status(400).json({ 
+                success: false,
+                message: 'Validation failed',
+                errors: errors.array() 
+            });
         }
 
         // Get teacher ID from auth middleware
         const teacherId = req.user.id;
+        console.log('👨‍🏫 Teacher ID:', teacherId);
 
         // Extract student data from request body
         const {
@@ -39,13 +47,17 @@ exports.createStudent = async (req, res) => {
         });
 
         if (existingStudent) {
+            console.log('❌ Student already exists');
             return res.status(400).json({
+                success: false,
                 message: existingStudent.email === email.toLowerCase() 
                     ? 'Student with this email already exists'
                     : 'Student with this admission number already exists'
             });
         }
 
+        console.log('✅ Creating new student...');
+        
         // Create new student
         const student = new Student({
             name,
@@ -61,7 +73,9 @@ exports.createStudent = async (req, res) => {
         });
 
         // Save the student to database
+        console.log('💾 Saving student to database...');
         await student.save();
+        console.log('✅ Student saved successfully!');
 
         // Remove password from response
         const studentResponse = student.toObject();
@@ -69,13 +83,16 @@ exports.createStudent = async (req, res) => {
 
         // Send success response
         res.status(201).json({
+            success: true,
             message: 'Student created successfully',
             student: studentResponse
         });
 
     } catch (error) {
-        console.error('Error creating student:', error);
+        console.error('❌ Error creating student:', error);
+        console.error('❌ Error stack:', error.stack);
         res.status(500).json({ 
+            success: false,
             message: 'Error creating student',
             error: error.message
         });
