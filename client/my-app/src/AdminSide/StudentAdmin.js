@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './AdminDashboard.css';
+import { API_URL } from '../config';
 
 function Students({ embedded = false }) {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [filters, setFilters] = useState({
     batch: '',
@@ -12,99 +14,68 @@ function Students({ embedded = false }) {
     search: ''
   });
 
-  // Mock data - replace with actual API calls
-  useEffect(() => {
-    setTimeout(() => {
-      const mockStudents = [
-        {
-          id: 1,
-          name: 'Aarav Sharma',
-          rollNo: 'CS2024001',
-          class: 'Computer Science',
-          year: 'Final Year',
-          batch: '2024',
-          email: 'aarav.sharma@college.edu',
-          phone: '+91 9876543210',
-          attendance: 92,
-          gpa: 8.7,
-          status: 'Active',
-          joinDate: '2021-08-15'
-        },
-        {
-          id: 2,
-          name: 'Priya Patel',
-          rollNo: 'IT2024001',
-          class: 'Information Technology',
-          year: 'Final Year',
-          batch: '2024',
-          email: 'priya.patel@college.edu',
-          phone: '+91 9876543211',
-          attendance: 88,
-          gpa: 9.2,
-          status: 'Active',
-          joinDate: '2021-08-15'
-        },
-        {
-          id: 3,
-          name: 'Rohan Kumar',
-          rollNo: 'CS2025001',
-          class: 'Computer Science',
-          year: 'Third Year',
-          batch: '2025',
-          email: 'rohan.kumar@college.edu',
-          phone: '+91 9876543212',
-          attendance: 95,
-          gpa: 8.9,
-          status: 'Active',
-          joinDate: '2022-08-15'
-        },
-        {
-          id: 4,
-          name: 'Sneha Gupta',
-          rollNo: 'EC2025001',
-          class: 'Electronics',
-          year: 'Third Year',
-          batch: '2025',
-          email: 'sneha.gupta@college.edu',
-          phone: '+91 9876543213',
-          attendance: 85,
-          gpa: 8.1,
-          status: 'Active',
-          joinDate: '2022-08-15'
-        },
-        {
-          id: 5,
-          name: 'Vikram Singh',
-          rollNo: 'ME2026001',
-          class: 'Mechanical',
-          year: 'Second Year',
-          batch: '2026',
-          email: 'vikram.singh@college.edu',
-          phone: '+91 9876543214',
-          attendance: 78,
-          gpa: 7.8,
-          status: 'Active',
-          joinDate: '2023-08-15'
-        },
-        {
-          id: 6,
-          name: 'Ananya Reddy',
-          rollNo: 'CS2026001',
-          class: 'Computer Science',
-          year: 'Second Year',
-          batch: '2026',
-          email: 'ananya.reddy@college.edu',
-          phone: '+91 9876543215',
-          attendance: 96,
-          gpa: 9.4,
-          status: 'Active',
-          joinDate: '2023-08-15'
+  // Fetch students from database
+  const fetchStudents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('Please log in to view students.');
+        setLoading(false);
+        return;
+      }
+      
+      const response = await fetch(`${API_URL}/api/admin/students`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      ];
-      setStudents(mockStudents);
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        setError('Not authorized. Please log in as admin.');
+        setLoading(false);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch students');
+      }
+
+      const data = await response.json();
+      
+      // Map database fields to component fields
+      const mappedStudents = (data.students || []).map(student => ({
+        id: student._id,
+        name: student.studentName,
+        rollNo: student.rollNo,
+        class: student.class,
+        year: student.year,
+        batch: student.batch,
+        email: student.email,
+        phone: student.phone || '',
+        attendance: student.attendance || 0,
+        gpa: student.gpa || 0,
+        status: student.status || 'Active',
+        joinDate: student.createdAt
+      }));
+
+      setStudents(mappedStudents);
+      setError(''); // Clear any previous errors
+    } catch (err) {
+      console.error('Error fetching students:', err);
+      setError('Failed to load students. Please try again.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   // Filter students based on filters
   const filteredStudents = students.filter(student => {
@@ -141,14 +112,47 @@ function Students({ embedded = false }) {
     console.log('Edit student:', student);
   };
 
-  const handleDeleteStudent = (student) => {
+  const handleDeleteStudent = async (student) => {
     // Delete student functionality
     if (window.confirm(`Are you sure you want to delete ${student.name}?`)) {
-      console.log('Delete student:', student);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/api/admin/students/${student.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          // Refresh the student list
+          fetchStudents();
+        } else {
+          const data = await response.json();
+          alert(data.message || 'Failed to delete student');
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Failed to delete student. Please try again.');
+      }
     }
   };
 
   if (loading) return <div className="loading">Loading students...</div>;
+  if (error) return <div className="error-message">{error} <button onClick={fetchStudents}>Retry</button></div>;
+
+  // Show empty state if no students
+  if (students.length === 0) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon">🧑‍🎓</div>
+        <h3>No Students Found</h3>
+        <p>No student records in the database yet.</p>
+        <p>Use the <strong>Data Upload</strong> feature to import students from an Excel file.</p>
+      </div>
+    );
+  }
 
   // Main content that will be rendered in both embedded and full modes
   const studentsContent = (

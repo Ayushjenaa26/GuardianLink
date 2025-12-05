@@ -25,6 +25,12 @@ const adminSchema = new mongoose.Schema({
         required: [true, 'Phone number is required'],
         trim: true
     },
+    adminId: {
+        type: String,
+        required: [true, 'Admin Unique ID is required'],
+        unique: true,
+        trim: true
+    },
     role: {
         type: String,
         default: 'admin',

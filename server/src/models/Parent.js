@@ -30,14 +30,11 @@ const parentSchema = new mongoose.Schema({
         required: [true, 'Phone number is required'],
         trim: true
     },
-    childName: {
+    studentRollNo: {
         type: String,
-        required: [true, 'Child name is required'],
+        required: [true, 'Student Roll Number is required'],
+        unique: true,
         trim: true
-    },
-    childClass: {
-        type: String,
-        required: [true, 'Child class is required']
     }
 }, {
     timestamps: true

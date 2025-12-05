@@ -112,7 +112,7 @@ function TeacherDashboard() {
                   </div>
                   <div className="parent-card card-red">
                     <div>📝 Pending Reviews</div>
-                    <div className="parent-card-value">{dashboardData.pendingReviews}</div>
+                    <div className="parent-card-value">0</div>
                     <div className="parent-card-desc">Assignments awaiting review</div>
                   </div>
                   <div className="parent-card card-green">

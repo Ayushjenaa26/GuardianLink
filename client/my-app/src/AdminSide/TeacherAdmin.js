@@ -1,10 +1,12 @@
 // Teachers.js (Admin Dashboard)
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './TeacherAdmin.css';
+import { API_URL } from '../config';
 
 function Teachers({ embedded = false }) {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [filters, setFilters] = useState({
     department: '',
@@ -13,117 +15,71 @@ function Teachers({ embedded = false }) {
     search: ''
   });
 
-  // Mock data - replace with actual API calls
-  useEffect(() => {
-    setTimeout(() => {
-      const mockTeachers = [
-        {
-          id: 1,
-          name: 'Dr. Rajesh Kumar',
-          employeeId: 'TECH001',
-          department: 'Computer Science',
-          designation: 'Professor',
-          email: 'rajesh.kumar@college.edu',
-          phone: '+91 9876543210',
-          subjects: ['Data Structures', 'Algorithms'],
-          experience: '15 years',
-          qualification: 'Ph.D. in Computer Science',
-          classes: 6,
-          students: 180,
-          joinDate: '2015-08-15',
-          status: 'Active',
-          attendance: 98
-        },
-        {
-          id: 2,
-          name: 'Prof. Priya Sharma',
-          employeeId: 'TECH002',
-          department: 'Information Technology',
-          designation: 'Associate Professor',
-          email: 'priya.sharma@college.edu',
-          phone: '+91 9876543211',
-          subjects: ['Database Systems', 'Web Development'],
-          experience: '12 years',
-          qualification: 'M.Tech, Ph.D.',
-          classes: 5,
-          students: 150,
-          joinDate: '2018-06-01',
-          status: 'Active',
-          attendance: 95
-        },
-        {
-          id: 3,
-          name: 'Dr. Amit Patel',
-          employeeId: 'TECH003',
-          department: 'Electronics',
-          designation: 'Professor',
-          email: 'amit.patel@college.edu',
-          phone: '+91 9876543212',
-          subjects: ['Digital Electronics', 'Microprocessors'],
-          experience: '18 years',
-          qualification: 'Ph.D. in Electronics',
-          classes: 4,
-          students: 120,
-          joinDate: '2010-03-20',
-          status: 'Active',
-          attendance: 99
-        },
-        {
-          id: 4,
-          name: 'Ms. Anjali Singh',
-          employeeId: 'TECH004',
-          department: 'Computer Science',
-          designation: 'Assistant Professor',
-          email: 'anjali.singh@college.edu',
-          phone: '+91 9876543213',
-          subjects: ['Python Programming', 'Machine Learning'],
-          experience: '8 years',
-          qualification: 'M.Tech in AI',
-          classes: 7,
-          students: 210,
-          joinDate: '2020-01-10',
-          status: 'Active',
-          attendance: 92
-        },
-        {
-          id: 5,
-          name: 'Dr. Sanjay Verma',
-          employeeId: 'TECH005',
-          department: 'Mechanical',
-          designation: 'Professor',
-          email: 'sanjay.verma@college.edu',
-          phone: '+91 9876543214',
-          subjects: ['Thermodynamics', 'Fluid Mechanics'],
-          experience: '20 years',
-          qualification: 'Ph.D. in Mechanical Engineering',
-          classes: 3,
-          students: 90,
-          joinDate: '2008-07-15',
-          status: 'On Leave',
-          attendance: 85
-        },
-        {
-          id: 6,
-          name: 'Prof. Neha Gupta',
-          employeeId: 'TECH006',
-          department: 'Information Technology',
-          designation: 'Assistant Professor',
-          email: 'neha.gupta@college.edu',
-          phone: '+91 9876543215',
-          subjects: ['Software Engineering', 'Mobile Development'],
-          experience: '6 years',
-          qualification: 'M.Tech in Software Systems',
-          classes: 6,
-          students: 180,
-          joinDate: '2021-08-01',
-          status: 'Active',
-          attendance: 96
+  // Fetch teachers from database
+  const fetchTeachers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('Please log in to view teachers.');
+        setLoading(false);
+        return;
+      }
+      
+      const response = await fetch(`${API_URL}/api/admin/teachers`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      ];
-      setTeachers(mockTeachers);
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        setError('Not authorized. Please log in as admin.');
+        setLoading(false);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch teachers');
+      }
+
+      const data = await response.json();
+      
+      // Map database fields to component fields
+      const mappedTeachers = (data.teachers || []).map(teacher => ({
+        id: teacher._id,
+        name: teacher.teacherName,
+        employeeId: teacher.employeeId,
+        department: teacher.department || '',
+        designation: teacher.designation || 'Teacher',
+        email: teacher.email,
+        phone: teacher.phone || '',
+        subjects: teacher.subject ? [teacher.subject] : [],
+        experience: teacher.experience || '0 years',
+        qualification: teacher.qualification || '',
+        classes: teacher.classes ? (Array.isArray(teacher.classes) ? teacher.classes.length : teacher.classes.split(',').length) : 0,
+        students: 0, // Calculate based on classes if needed
+        joinDate: teacher.createdAt,
+        status: teacher.status || 'Active',
+        attendance: teacher.attendance || 95
+      }));
+
+      setTeachers(mappedTeachers);
+      setError(''); // Clear any previous errors
+    } catch (err) {
+      console.error('Error fetching teachers:', err);
+      setError('Failed to load teachers. Please try again.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchTeachers();
+  }, [fetchTeachers]);
 
   // Filter teachers based on filters
   const filteredTeachers = teachers.filter(teacher => {
@@ -160,10 +116,30 @@ function Teachers({ embedded = false }) {
     console.log('Edit teacher:', teacher);
   };
 
-  const handleDeleteTeacher = (teacher) => {
+  const handleDeleteTeacher = async (teacher) => {
     // Delete teacher functionality
     if (window.confirm(`Are you sure you want to delete ${teacher.name}?`)) {
-      console.log('Delete teacher:', teacher);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/api/admin/teachers/${teacher.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          // Refresh the teacher list
+          fetchTeachers();
+        } else {
+          const data = await response.json();
+          alert(data.message || 'Failed to delete teacher');
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Failed to delete teacher. Please try again.');
+      }
     }
   };
 
@@ -173,6 +149,19 @@ function Teachers({ embedded = false }) {
   };
 
   if (loading) return <div className="loading">Loading teachers...</div>;
+  if (error) return <div className="error-message">{error} <button onClick={fetchTeachers}>Retry</button></div>;
+
+  // Show empty state if no teachers
+  if (teachers.length === 0) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon">🧑‍🏫</div>
+        <h3>No Teachers Found</h3>
+        <p>No teacher records in the database yet.</p>
+        <p>Use the <strong>Data Upload</strong> feature to import teachers from an Excel file.</p>
+      </div>
+    );
+  }
 
   // Main content that will be rendered in both embedded and full modes
   const teachersContent = (

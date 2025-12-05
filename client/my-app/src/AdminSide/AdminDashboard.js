@@ -1,14 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 import ReportAdmin from './ReportAdmin';
 import StudentAdmin from './StudentAdmin';
 import Teachers from './TeacherAdmin';
 import FeeManagement from './FeeManagement';
+import DataUpload from './DataUpload';
+import { API_URL } from '../config';
 
 function AdminDashboard({ onSignOut }) {
   const [activeSection, setActiveSection] = useState('students');
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalTeachers: 0,
+    activeStudents: 0,
+    activeTeachers: 0
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Fetch dashboard stats from database
+  const fetchStats = useCallback(async () => {
+    try {
+      setStatsLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/admin/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats({
+          totalStudents: data.totalStudents || 0,
+          totalTeachers: data.totalTeachers || 0,
+          activeStudents: data.activeStudents || 0,
+          activeTeachers: data.activeTeachers || 0
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   // Get admin info from localStorage
   const getAdminInfo = () => {
@@ -58,60 +99,60 @@ function AdminDashboard({ onSignOut }) {
         {/* Dashboard Stats Cards */}
         <section className="parent-cards">
           <div className="parent-card card-blue">
-            <div>Your Students</div>
-            <div className="parent-card-value">1,234</div>
-            <div className="parent-card-desc">+1% from last month</div>
+            <div>Total Students</div>
+            <div className="parent-card-value">{statsLoading ? '...' : stats.totalStudents}</div>
+            <div className="parent-card-desc">{stats.activeStudents} active</div>
           </div>
           <div className="parent-card card-green">
-            <div>Your Faculty</div>
-            <div className="parent-card-value">89</div>
-            <div className="parent-card-desc">+2 new this month</div>
+            <div>Total Faculty</div>
+            <div className="parent-card-value">{statsLoading ? '...' : stats.totalTeachers}</div>
+            <div className="parent-card-desc">{stats.activeTeachers} active</div>
           </div>
           <div className="parent-card card-purple">
             <div>Fee Collection</div>
-            <div className="parent-card-value">Rs 12.5L</div>
-            <div className="parent-card-desc">95% collected</div>
+            <div className="parent-card-value">Rs 0</div>
+            <div className="parent-card-desc">Coming soon</div>
           </div>
           <div className="parent-card card-orange">
             <div>Attendance Rate</div>
-            <div className="parent-card-value">92%</div>
-            <div className="parent-card-desc">+3% from last week</div>
+            <div className="parent-card-value">--</div>
+            <div className="parent-card-desc">Coming soon</div>
           </div>
         </section>
 
-        {/* Recent Activity Section */}
+        {/* Quick Actions Section */}
         <section className="recent-activity">
           <div className="section-header">
-            <h3>Recent Activity</h3>
-            <span>Stay updated with the latest changes</span>
+            <h3>Quick Actions</h3>
+            <span>Manage your institution</span>
           </div>
           <div className="activity-list">
-            <div className="activity-item">
-              <div className="activity-icon">💳</div>
+            <div className="activity-item" onClick={() => setActiveSection('upload')} style={{cursor: 'pointer'}}>
+              <div className="activity-icon">📤</div>
               <div className="activity-content">
-                <div className="activity-title">Development Fee Reminder</div>
-                <div className="activity-desc">Payment due on January 25, 2025</div>
+                <div className="activity-title">Upload Data</div>
+                <div className="activity-desc">Import students and teachers from Excel</div>
               </div>
             </div>
-            <div className="activity-item">
-              <div className="activity-icon">✅</div>
+            <div className="activity-item" onClick={() => setActiveSection('students')} style={{cursor: 'pointer'}}>
+              <div className="activity-icon">🧑‍🎓</div>
               <div className="activity-content">
-                <div className="activity-title">Attendance Updates</div>
-                <div className="activity-desc">Your child was marked present in Full Stack Development Lab today</div>
+                <div className="activity-title">Manage Students</div>
+                <div className="activity-desc">View and manage student records</div>
               </div>
             </div>
-            <div className="activity-item">
+            <div className="activity-item" onClick={() => setActiveSection('teachers')} style={{cursor: 'pointer'}}>
+              <div className="activity-icon">🧑‍🏫</div>
+              <div className="activity-content">
+                <div className="activity-title">Manage Teachers</div>
+                <div className="activity-desc">View and manage faculty records</div>
+              </div>
+            </div>
+            <div className="activity-item" onClick={() => setActiveSection('reports')} style={{cursor: 'pointer'}}>
               <div className="activity-icon">📊</div>
               <div className="activity-content">
-                <div className="activity-title">New Marks Added</div>
-                <div className="activity-desc">Software Engineering assignment results are now available</div>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon">🕒</div>
-              <div className="activity-content">
-                <div className="activity-title">Lab Schedule Updates</div>
-                <div className="activity-desc">Computer Networks Lab has been rescheduled to 2:00 PM tomorrow</div>
+                <div className="activity-title">View Reports</div>
+                <div className="activity-desc">Generate and view analytical reports</div>
               </div>
             </div>
           </div>
@@ -170,6 +211,13 @@ function AdminDashboard({ onSignOut }) {
           >
             <span role="img" aria-label="fee">💳</span> Fee Management
           </button>
+          <button
+            className={activeSection === 'upload' ? 'active' : ''}
+            onClick={() => setActiveSection('upload')}
+            aria-label="Data Upload"
+          >
+            <span role="img" aria-label="upload">📤</span> Data Upload
+          </button>
         </nav>
         <div className="parent-user">
           <div className="parent-avatar" style={{background:'#a855f7'}}> 
@@ -190,6 +238,7 @@ function AdminDashboard({ onSignOut }) {
         {activeSection === 'students' && <StudentAdmin embedded={true} />}
         {activeSection === 'teachers' && <Teachers embedded={true} />}
         {activeSection === 'fee' && <FeeManagement embedded={true} />}
+        {activeSection === 'upload' && <DataUpload embedded={true} />}
       </main>
     </div>
   );

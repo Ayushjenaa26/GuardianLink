@@ -7,6 +7,7 @@ const Teacher = require('../models/TeacherSide/Teacher');
 const Student = require('../models/Student');
 const Admin = require('../models/Admin');
 const Parent = require('../models/Parent');
+const AdminCode = require('../models/AdminCode');
 
 // Login handler
 exports.login = async (req, res) => {
@@ -91,8 +92,7 @@ exports.login = async (req, res) => {
                 }),
                 ...(role.toLowerCase() === 'parent' && {
                     phone: user.phone,
-                    childName: user.childName,
-                    childClass: user.childClass
+                    studentRollNo: user.studentRollNo
                 }),
                 ...(role.toLowerCase() === 'student' && {
                     class: user.class,
@@ -100,7 +100,8 @@ exports.login = async (req, res) => {
                     admissionNumber: user.admissionNumber
                 }),
                 ...(role.toLowerCase() === 'admin' && {
-                    permissions: user.permissions
+                    permissions: user.permissions,
+                    adminId: user.adminId
                 })
             }
         });
@@ -164,6 +165,24 @@ exports.register = async (req, res) => {
             });
         }
 
+        // Validate admin code if registering as admin
+        if (role.toLowerCase() === 'admin') {
+            if (!additionalFields.adminId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Admin Unique ID is required'
+                });
+            }
+
+            const codeValidation = await AdminCode.isValidCode(additionalFields.adminId);
+            if (!codeValidation.valid) {
+                return res.status(400).json({
+                    success: false,
+                    message: codeValidation.message
+                });
+            }
+        }
+
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -178,6 +197,11 @@ exports.register = async (req, res) => {
         };
 
         const user = await UserModel.create(userData);
+
+        // Mark admin code as used if admin registration
+        if (role.toLowerCase() === 'admin' && additionalFields.adminId) {
+            await AdminCode.markAsUsed(additionalFields.adminId, user._id);
+        }
 
         // Generate JWT token
         const token = jwt.sign(
@@ -200,8 +224,7 @@ exports.register = async (req, res) => {
                 }),
                 ...(role.toLowerCase() === 'parent' && {
                     phone: user.phone,
-                    childName: user.childName,
-                    childClass: user.childClass
+                    studentRollNo: user.studentRollNo
                 }),
                 ...(role.toLowerCase() === 'student' && {
                     class: user.class,
@@ -209,7 +232,8 @@ exports.register = async (req, res) => {
                     admissionNumber: user.admissionNumber
                 }),
                 ...(role.toLowerCase() === 'admin' && {
-                    permissions: user.permissions
+                    permissions: user.permissions,
+                    adminId: user.adminId
                 })
             }
         });

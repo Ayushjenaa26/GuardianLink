@@ -172,6 +172,74 @@ const MarksKT = () => {
 
   const currentTrends = performanceTrends[activeSubject];
 
+  // Function to export marks data to CSV
+  const exportMarksToCSV = () => {
+    try {
+      let csvContent = '';
+      let filename = '';
+
+      if (activeTab === 'students') {
+        // Export student details
+        filename = `Marks_${activeSubject.replace(/ /g, '_')}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
+        
+        // CSV Header
+        csvContent = 'Student ID,Student Name,Attendance %,Assignment 1,Assignment 2,Assignment 3,Assignment 4,Assignment 5,Assignments Avg,Exam 1,Exam 2,Exam Avg,Overall %,KT Status,Trend\n';
+        
+        // CSV Rows
+        studentsData.forEach(student => {
+          const assignmentsAvg = Math.round(student.assignments.reduce((a, b) => a + b, 0) / student.assignments.length);
+          const examAvg = Math.round(student.exams.reduce((a, b) => a + b, 0) / student.exams.length);
+          
+          csvContent += `"${student.id}","${student.name}",${student.attendance}%,`;
+          csvContent += student.assignments.join(',') + ',';
+          csvContent += `${assignmentsAvg},`;
+          csvContent += student.exams.join(',') + ',';
+          csvContent += `${examAvg},${student.overall}%,"${student.ktStatus}","${student.trend}"\n`;
+        });
+      } else if (activeTab === 'kt') {
+        // Export KT students
+        filename = `KT_Students_${activeSubject.replace(/ /g, '_')}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
+        
+        csvContent = 'Student ID,Student Name,Overall %,Attendance %,KT Status,Reason\n';
+        
+        studentsData
+          .filter(student => student.ktStatus === 'KT Pending' || student.ktStatus === 'At Risk')
+          .forEach(student => {
+            const reason = student.ktStatus === 'KT Pending' ? 'Multiple assignment failures' : 'Borderline scores';
+            csvContent += `"${student.id}","${student.name}",${student.overall}%,${student.attendance}%,"${student.ktStatus}","${reason}"\n`;
+          });
+      } else {
+        // Export overview/performance summary
+        filename = `Performance_Summary_${activeSubject.replace(/ /g, '_')}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
+        
+        csvContent = 'Metric,Value\n';
+        csvContent += `"Class Average","${currentTrends.averageScore}%"\n`;
+        csvContent += `"Top Performer","${currentTrends.topPerformer}"\n`;
+        csvContent += `"KT Students","${currentTrends.ktStudents}"\n`;
+        csvContent += `"Assignment Completion","${currentTrends.assignmentCompletion}%"\n`;
+        csvContent += `"Improvement Rate","${currentTrends.improvementRate}"\n`;
+        csvContent += `"Students Needing Attention","${currentTrends.needsAttention.join(', ')}"\n`;
+      }
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('✅ Marks CSV exported successfully:', filename);
+    } catch (error) {
+      console.error('❌ Error exporting marks CSV:', error);
+      alert('Failed to export report. Please try again.');
+    }
+  };
+
   // Function to generate random color for avatars
   const getAvatarColor = (name) => {
     const colors = [
@@ -197,8 +265,7 @@ const MarksKT = () => {
           <p>Track student performance and manage KT records</p>
         </div>
         <div className="header-actions">
-          <button className="btn-primary">Add New Marks</button>
-          <button className="btn-secondary">Export Report</button>
+          <button className="btn-secondary" onClick={exportMarksToCSV}>📥 Export Report</button>
         </div>
       </div>
 
@@ -395,6 +462,12 @@ const MarksKT = () => {
                                 {score}%
                               </span>
                             ))}
+                            <div 
+                              className={`score-display ${getPerformanceColorClass(examAvg)}`}
+                              style={{marginTop: '4px', fontSize: '11px'}}
+                            >
+                              Avg: {examAvg}%
+                            </div>
                           </div>
                         </td>
                         <td>

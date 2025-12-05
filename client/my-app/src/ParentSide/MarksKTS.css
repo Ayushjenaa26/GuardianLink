@@ -1,0 +1,376 @@
+/* MarksKTS.css */
+
+/* --- Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Main Layout & Section --- */
+.marks-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* --- Semester Selector --- */
+.semester-selector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Changed from white to Dark Navy */
+  background: #1F213A; 
+  padding: 20px 28px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.semester-selector:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.semester-selector h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  /* Changed to white */
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.semester-dropdown {
+  padding: 12px 20px;
+  border-radius: 12px;
+  /* Dark input styling */
+  border: 1px solid #2B2E4A;
+  background-color: #151725;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.semester-dropdown:hover {
+  border-color: #6a4cf7;
+  background-color: #1A1C2E;
+  transform: translateY(-1px);
+}
+
+.semester-dropdown:focus {
+  border-color: #6a4cf7;
+  box-shadow: 0 0 0 4px rgba(106, 76, 247, 0.2);
+}
+
+/* --- Marks Overview Cards --- */
+.marks-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.overview-card {
+  /* Dark Navy Background */
+  background: #1F213A;
+  border-radius: 20px;
+  padding: 26px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+/* A subtle top glow on hover */
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #6a4cf7, #b2a4ff);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  background: #252843; /* Slightly lighter on hover */
+  border-color: rgba(106, 76, 247, 0.3);
+}
+
+.overview-card:hover::before {
+  opacity: 1;
+}
+
+.overview-title {
+  font-size: 0.85rem;
+  /* Light grey for labels */
+  color: #a0a0b0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.overview-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  /* White for values */
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.overview-trend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+}
+
+/* Trend Colors - Adjusted for Dark Mode Contrast */
+.overview-card:nth-child(1) .overview-trend { background: rgba(5, 150, 105, 0.2); color: #34d399; } /* Green */
+.overview-card:nth-child(2) .overview-trend { background: rgba(75, 85, 99, 0.3); color: #d1d5db; } /* Grey */
+.overview-card:nth-child(3) .overview-trend { background: rgba(37, 99, 235, 0.2); color: #60a5fa; } /* Blue */
+.overview-card:nth-child(4) .overview-trend { background: rgba(234, 88, 12, 0.2); color: #fb923c; } /* Orange */
+
+/* --- Marks Table --- */
+.marks-table-container {
+  /* Dark Navy Background */
+  background: #1F213A;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.marks-table-container:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.marks-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 700px;
+}
+
+.marks-table th {
+  text-align: left;
+  padding: 18px 20px;
+  /* Muted grey for headers */
+  color: #9494a8;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* Match container bg */
+  background: #1F213A;
+  border-bottom: 2px solid #2B2E4A;
+  position: sticky;
+  top: 0;
+}
+
+.marks-table td {
+  padding: 18px 20px;
+  /* White text for data */
+  color: #e2e2e8;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-bottom: 1px solid #2B2E4A;
+  transition: all 0.2s ease;
+}
+
+/* Row Hover Effect */
+.marks-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.marks-table tbody tr:hover td {
+  /* Lighter highlight on hover */
+  background-color: #262945;
+  color: #ffffff;
+}
+
+.marks-table tbody tr:hover td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.marks-table tbody tr:hover td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Grade Badges - Kept distinct but adjusted */
+.grade-a, .grade-a-minus, .grade-b-plus {
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 30px;
+  display: inline-block;
+  text-align: center;
+  min-width: 48px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.grade-a, .grade-a-minus {
+  color: #86efac; /* Lighter green text */
+  background: rgba(22, 101, 52, 0.4); /* Transparent dark green bg */
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.grade-b-plus {
+  color: #fdba74; /* Lighter orange text */
+  background: rgba(154, 52, 18, 0.4); /* Transparent dark orange bg */
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+/* --- KT Status Section --- */
+.kt-status {
+  margin-top: 10px;
+}
+
+.kt-status h3 {
+  font-size: 1.25rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kt-status h3::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 24px;
+  background: #6a4cf7;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(106, 76, 247, 0.5); /* Glow effect */
+}
+
+.kt-cards {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.kt-card {
+  flex: 1;
+  min-width: 300px;
+  border-radius: 20px;
+  padding: 28px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.kt-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+/* KT Card Icon Animation */
+.kt-card .kt-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  /* Dark background for icon container */
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1;
+}
+
+.kt-card:hover .kt-icon {
+  transform: scale(1.1) rotate(10deg);
+}
+
+/* Success Card Style - Dark Green Gradient */
+.kt-card.no-kt {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.6) 0%, rgba(20, 83, 45, 0.4) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.kt-card.no-kt .kt-title { color: #86efac; }
+.kt-card.no-kt .kt-desc { color: #bbf7d0; opacity: 0.8; }
+
+/* Info/Cleared Card Style - Dark Blue Gradient */
+.kt-card.cleared-kt {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(30, 64, 175, 0.4) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.kt-card.cleared-kt .kt-title { color: #93c5fd; }
+.kt-card.cleared-kt .kt-desc { color: #bfdbfe; opacity: 0.8; }
+
+.kt-content {
+  flex: 1;
+  z-index: 1;
+}
+
+.kt-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.kt-desc {
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.kt-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kt-details span {
+  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  animation: slideInRight 0.4s ease-out backwards;
+}
+
+.kt-details span:nth-child(1) { animation-delay: 0.1s; }
+.kt-details span:nth-child(2) { animation-delay: 0.2s; }

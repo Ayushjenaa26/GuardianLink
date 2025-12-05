@@ -87,16 +87,18 @@ app.use((req, res, next) => {
 // Import and mount routes
 const authRoutes = require('./routes/authRoutes');
 const teacherRoutes = require('./routes/TeacherSide/teacherRoutes');
+const adminRoutes = require('./routes/AdminSide/adminRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/teacher', teacherRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root API endpoint
 app.get('/api', (req, res) => {
     res.json({
         message: 'GuardianLink API Server',
         version: '1.0.0',
-        endpoints: ['/api/auth', '/api/teacher', '/api/health']
+        endpoints: ['/api/auth', '/api/teacher', '/api/admin', '/api/health']
     });
 });
 

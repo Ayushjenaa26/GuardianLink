@@ -256,6 +256,61 @@ const TeacherAttendance = () => {
     setSelectedClass(className);
   };
 
+  // Function to export attendance data to CSV
+  const exportToCSV = () => {
+    try {
+      // Prepare data based on active tab
+      let csvContent = '';
+      let filename = '';
+
+      if (activeTab === 'detailed' && detailedAttendanceByDate.length > 0 && selectedDate) {
+        // Export detailed records for selected date
+        const dateData = detailedAttendanceByDate.find(d => d.date.toDateString() === selectedDate.toDateString());
+        if (!dateData) return;
+
+        filename = `Attendance_${selectedClass === 'all' ? 'All_Classes' : selectedClass}_${selectedDate.toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
+        
+        // CSV Header
+        csvContent = 'Student Name,Student ID,Class,Status,Date\n';
+        
+        // CSV Rows
+        dateData.students.forEach(student => {
+          const statusLabel = student.status === 'P' ? 'Present' : student.status === 'A' ? 'Absent' : 'Late';
+          csvContent += `"${student.name}","${student.id}","${student.class}","${statusLabel}","${selectedDate.toLocaleDateString('en-US')}"\n`;
+        });
+      } else {
+        // Export overview/summary data
+        filename = `Attendance_Summary_${selectedClass === 'all' ? 'All_Classes' : selectedClass}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
+        
+        // CSV Header
+        csvContent = 'Student Name,Student ID,Class,Overall Attendance %,Status Today\n';
+        
+        // CSV Rows
+        todaysAttendance.forEach(student => {
+          const statusLabel = student.status === 'present' ? 'Present' : student.status === 'absent' ? 'Absent' : 'Late';
+          csvContent += `"${student.name}","${student.studentId || 'N/A'}","${selectedClass === 'all' ? 'All' : selectedClass}","${overviewStats.overallRate}%","${statusLabel}"\n`;
+        });
+      }
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('✅ CSV exported successfully:', filename);
+    } catch (error) {
+      console.error('❌ Error exporting CSV:', error);
+      alert('Failed to export report. Please try again.');
+    }
+  };
+
   return (
     <div className="teacher-attendance">
       {/* Header Section */}
@@ -265,7 +320,7 @@ const TeacherAttendance = () => {
           <p>Track and manage student attendance with real-time insights and analytics</p>
         </div>
         <div className="header-actions">
-          <button className="btn-export">📥 Export Report</button>
+          <button className="btn-export" onClick={exportToCSV}>📥 Export Report</button>
         </div>
       </div>
 

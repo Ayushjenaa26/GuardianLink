@@ -1,9 +1,11 @@
 # 🔧 Fix Vercel 404 Error
 
 ## Problem
+
 Getting `404 (Not Found)` on https://guardianlink-omega.vercel.app/
 
 ## Root Cause
+
 Vercel's root directory or build configuration is incorrect.
 
 ---
@@ -13,28 +15,32 @@ Vercel's root directory or build configuration is incorrect.
 ### Method 1: Via Vercel Dashboard (Recommended)
 
 #### Step 1: Go to Project Settings
+
 1. Visit: https://vercel.com/dashboard
 2. Click on your **guardianlink-omega** project
 3. Click **Settings** (top menu)
 
 #### Step 2: Update Root Directory
+
 1. Scroll to **General** section
 2. Find **Root Directory**
 3. Set to: `client/my-app`
 4. Click **Save**
 
 #### Step 3: Verify Build Settings
+
 In **Settings** → **General**:
 
-| Setting | Value |
-|---------|-------|
+| Setting              | Value                                 |
+| -------------------- | ------------------------------------- |
 | **Framework Preset** | Create React App (should auto-detect) |
-| **Build Command** | `npm run build` or leave empty (auto) |
-| **Output Directory** | `build` or leave empty (auto) |
-| **Install Command** | `npm install` or leave empty (auto) |
-| **Root Directory** | `client/my-app` ⚠️ IMPORTANT |
+| **Build Command**    | `npm run build` or leave empty (auto) |
+| **Output Directory** | `build` or leave empty (auto)         |
+| **Install Command**  | `npm install` or leave empty (auto)   |
+| **Root Directory**   | `client/my-app` ⚠️ IMPORTANT          |
 
 #### Step 4: Add Environment Variables
+
 In **Settings** → **Environment Variables**, add:
 
 ```
@@ -47,6 +53,7 @@ REACT_APP_DEBUG = false
 **Important:** Make sure to select **Production** environment for each variable.
 
 #### Step 5: Trigger New Deployment
+
 1. Go to **Deployments** tab
 2. Click on the latest deployment
 3. Click **⋯** (three dots menu) → **Redeploy**
@@ -60,17 +67,20 @@ Wait 2-3 minutes for the build to complete.
 ### Method 2: Delete and Recreate Project (If Method 1 Fails)
 
 #### Step 1: Delete Current Project
+
 1. Go to Vercel Dashboard
 2. Open your guardianlink-omega project
 3. Settings → Advanced → Delete Project
 4. Confirm deletion
 
 #### Step 2: Create New Project
+
 1. Click **Add New...** → **Project**
 2. Import your GitHub repository: **GuardianLink**
 3. Configure the project:
 
 **Build and Output Settings:**
+
 ```
 Root Directory: client/my-app
 Framework Preset: Create React App (auto-detected)
@@ -81,6 +91,7 @@ Install Command: npm install (or leave empty)
 
 **Environment Variables:**
 Add all 4 variables:
+
 ```
 REACT_APP_API_URL = https://guardianlink-wk12.onrender.com
 REACT_APP_ENV = production
@@ -99,24 +110,29 @@ Your new URL will be similar to: `https://guardianlink-omega-xxx.vercel.app`
 ## 🧪 Testing After Fix
 
 ### 1. Test Homepage
+
 Visit: https://guardianlink-omega.vercel.app/
 
 **Expected:** Your GuardianLink homepage should load with the cosmic theme
 
 ### 2. Check Console
+
 Press **F12** → **Console** tab
 
 **Expected:** No 404 errors, no CORS errors (after Render CORS update)
 
 ### 3. Test Routing
+
 Try navigating to: https://guardianlink-omega.vercel.app/auth
 
 **Expected:** Login page should load (not 404)
 
 ### 4. Check Network Tab
+
 F12 → **Network** tab → Refresh page
 
-**Expected:** 
+**Expected:**
+
 - `index.html` → Status 200
 - All JS/CSS bundles → Status 200
 - API calls to Render → Status 200 or CORS error (if CORS not set yet)
@@ -157,6 +173,7 @@ If you see errors about missing files or wrong directory, the Root Directory is 
 ## 🆘 Still Getting 404?
 
 ### Check Build Logs
+
 Look for these common issues:
 
 **Issue: "Cannot find package.json"**
@@ -171,6 +188,7 @@ Look for these common issues:
 → Check for build errors in logs
 
 ### Verify Local Build
+
 Test locally first:
 
 ```powershell
@@ -212,6 +230,7 @@ Once Vercel is working, update Render:
 ## 💡 Prevention
 
 To avoid this in the future:
+
 - Always set Root Directory when deploying monorepo
 - Use simple `vercel.json` (already fixed in your code)
 - Test local build before deploying

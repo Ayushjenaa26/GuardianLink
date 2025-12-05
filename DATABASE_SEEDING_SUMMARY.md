@@ -282,3 +282,16 @@ If you encounter any issues:
 **Generated**: November 10, 2025  
 **Database**: guardianlink (MongoDB Atlas)  
 **Status**: ✅ Successfully Seeded
+
+Admin Codes
+
+1. ADM-MISQNJV3-QRX2
+2. ADM-MISQNJV3-CGBF
+3. ADM-MISQNJV3-6G2P
+4. ADM-MISQNJV3-01QV
+5. ADM-MISQNJV3-FMT7
+6. ADM-MISQNJV3-SHVS
+7. ADM-MISQNJV3-Y5YK
+8. ADM-MISQNJV3-3QQG
+9. ADM-MISQNJV3-Y20E
+10. ADM-MISQNJV3-4NI3

@@ -1,0 +1,322 @@
+/* FeeStatus.css */
+
+/* --- Animations --- */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Layout --- */
+.fee-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  animation: slideUpFade 0.6s ease-out;
+}
+
+/* --- Summary Cards --- */
+.fee-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.fee-summary-card {
+  background: #1F213A;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.fee-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.fee-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  background: #151725;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.fee-content {
+  flex: 1;
+}
+
+.fee-amount, .fee-date {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.fee-label {
+  font-size: 0.9rem;
+  color: #a0a0b0;
+  font-weight: 500;
+}
+
+/* Card Variants */
+.fee-summary-card.paid {
+  border-bottom: 4px solid #34d399;
+}
+.fee-summary-card.paid .fee-icon { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+.fee-summary-card.paid .fee-amount { color: #34d399; }
+
+.fee-summary-card.pending {
+  border-bottom: 4px solid #fca5a5;
+}
+.fee-summary-card.pending .fee-icon { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+.fee-summary-card.pending .fee-amount { color: #fca5a5; }
+
+.fee-summary-card.due {
+  border-bottom: 4px solid #60a5fa;
+}
+.fee-summary-card.due .fee-icon { background: rgba(96, 165, 250, 0.1); color: #60a5fa; }
+.fee-summary-card.due .fee-date { color: #60a5fa; font-size: 1.5rem; }
+
+/* --- Fee Breakdown Table --- */
+.fee-details {
+  background: #1F213A;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fee-details h3,
+.payment-methods h3,
+.fee-reminders h3 {
+  color: #fff;
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.fee-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fee-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.fee-table th {
+  text-align: left;
+  padding: 16px 20px;
+  color: #9494a8;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  background: #151725;
+  border-bottom: 2px solid #2B2E4A;
+}
+
+.fee-table td {
+  padding: 16px 20px;
+  color: #e2e2e8;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #2B2E4A;
+  vertical-align: middle;
+}
+
+.fee-table tr:hover td {
+  background: #252843;
+}
+
+.fee-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badges */
+.status-paid {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+.status-pending {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+/* Action Buttons */
+.receipt-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #a0a0b0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+}
+
+.receipt-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: #fff;
+}
+
+.pay-btn {
+  background: linear-gradient(135deg, #6a4cf7, #8b5cf6);
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 10px rgba(106, 76, 247, 0.3);
+  transition: transform 0.2s;
+}
+
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(106, 76, 247, 0.5);
+}
+
+/* --- Payment Methods --- */
+.payment-methods {
+  background: #1F213A;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.payment-options {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.payment-option {
+  flex: 1;
+  min-width: 140px;
+  background: #151725;
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all 0.2s;
+}
+
+.payment-option:hover {
+  background: #252843;
+  transform: translateY(-4px);
+  border-color: #6a4cf7;
+}
+
+.payment-icon {
+  font-size: 2rem;
+}
+
+.payment-option span {
+  color: #e0e0e0;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* --- Reminders --- */
+.fee-reminders {
+  background: #1F213A;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reminder-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.reminder-item {
+  background: #151725;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.reminder-icon {
+  font-size: 1.8rem;
+  min-width: 40px;
+  text-align: center;
+}
+
+.reminder-content {
+  flex: 1;
+}
+
+.reminder-title {
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.reminder-desc {
+  color: #a0a0b0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Highlight pending reminder */
+.reminder-item:first-child {
+  border-left: 4px solid #f87171;
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.05) 0%, #151725 100%);
+}
+
+.reminder-item:last-child {
+  border-left: 4px solid #60a5fa;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.05) 0%, #151725 100%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fee-table {
+    font-size: 0.85rem;
+  }
+  
+  .fee-table th, .fee-table td {
+    padding: 12px;
+  }
+  
+  .receipt-btn, .pay-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}

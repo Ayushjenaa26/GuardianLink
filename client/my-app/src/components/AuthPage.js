@@ -19,13 +19,12 @@ const AuthPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
   
-  // Teacher specific
-  const [subject, setSubject] = useState('');
-  const [classes, setClasses] = useState('');
-  
   // Parent specific
-  const [childName, setChildName] = useState('');
-  const [childClass, setChildClass] = useState('');
+  const [studentRollNo, setStudentRollNo] = useState('');
+  
+  // Admin specific
+  const [adminId, setAdminId] = useState('');
+  const [showAdminHelp, setShowAdminHelp] = useState(false);
   
   const navigate = useNavigate();
 
@@ -123,50 +122,16 @@ const AuthPage = () => {
         }
 
         // Role-specific validations
-        if (role === 'teacher' && (!subject || !classes)) {
-          throw new Error('Please fill in subject and classes for teacher registration');
+        if (role === 'parent' && !studentRollNo) {
+          throw new Error('Please enter the Student Roll Number');
         }
 
-        if (role === 'parent' && (!childName || !childClass)) {
-          throw new Error('Please fill in child name and class for parent registration');
+        if (role === 'admin' && !adminId) {
+          throw new Error('Please enter your Admin Unique ID');
         }
       }
 
-      // For Admin and Parent - Skip API calls, use frontend only
-      if (role === 'admin' || role === 'parent') {
-        // Create mock user data
-        const mockUser = {
-          id: `${role}_${Date.now()}`,
-          email: email,
-          name: name || email.split('@')[0],
-          role: role
-        };
-
-        // Store mock authentication data
-        localStorage.setItem('token', `mock_token_${Date.now()}`);
-        localStorage.setItem('user', JSON.stringify(mockUser));
-
-        // Set success message
-        const successMsg = isLogin ? 'Login successful! Redirecting...' : 'Registration successful! Redirecting...';
-        setSuccess(successMsg);
-
-        // Navigate based on role
-        const roleRoutes = {
-          admin: '/admin',
-          parent: '/parent'
-        };
-
-        setTimeout(() => {
-          navigate(roleRoutes[role] || '/');
-        }, 1500);
-        
-        setLoading(false);
-        return;
-      }
-
-      // For Teacher - Continue with API calls
-
-      // Check server availability for teacher
+      // Check server availability
       const serverAvailable = await isServerAvailable();
       if (!serverAvailable) {
         throw new Error('Server is not available. Please try again later.');
@@ -189,14 +154,10 @@ const AuthPage = () => {
         requestBody.name = name.trim();
         requestBody.phone = phone;
         
-        if (role === 'teacher') {
-          requestBody.subject = subject;
-          requestBody.classes = classes.split(',').map(c => c.trim());
-        } else if (role === 'parent') {
-          requestBody.childName = childName;
-          requestBody.childClass = childClass;
+        if (role === 'parent') {
+          requestBody.studentRollNo = studentRollNo.trim();
         } else if (role === 'admin') {
-          // Admin registration - basic fields only
+          requestBody.adminId = adminId.trim();
           requestBody.permissions = ['manage_students', 'manage_teachers', 'manage_parents'];
         }
       }
@@ -425,22 +386,25 @@ const AuthPage = () => {
             </>
           )}
 
-          <div className="form-group">
-            <label htmlFor="role">Select Your Role</label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="form-select"
-              required
-            >
-              {roles.map((roleOption) => (
-                <option key={roleOption.id} value={roleOption.id}>
-                  {roleOption.icon} {roleOption.title} - {roleOption.description}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Sign Up Only: Role Selection */}
+          {!isLogin && (
+            <div className="form-group">
+              <label htmlFor="role">Select Your Role</label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="form-select"
+                required
+              >
+                {roles.map((roleOption) => (
+                  <option key={roleOption.id} value={roleOption.id}>
+                    {roleOption.icon} {roleOption.title} - {roleOption.description}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Sign Up Only: Phone Number (for all roles) */}
           {!isLogin && (
@@ -481,60 +445,82 @@ const AuthPage = () => {
             </div>
           )}
 
-          {/* Sign Up Only: Teacher Specific Fields */}
-          {!isLogin && role === 'teacher' && (
-            <>
-              <div className="form-group">
-                <label htmlFor="subject">Subject</label>
-                <input
-                  type="text"
-                  id="subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="e.g., Mathematics"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="classes">Classes (comma separated)</label>
-                <input
-                  type="text"
-                  id="classes"
-                  value={classes}
-                  onChange={(e) => setClasses(e.target.value)}
-                  placeholder="e.g., 10A, 10B, 11A"
-                  required
-                />
-              </div>
-            </>
+          {/* Sign Up Only: Admin Specific Fields */}
+          {!isLogin && role === 'admin' && (
+            <div className="form-group">
+              <label htmlFor="adminId">Unique ID</label>
+              <input
+                type="text"
+                id="adminId"
+                value={adminId}
+                onChange={(e) => setAdminId(e.target.value)}
+                placeholder="Enter your unique admin ID"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowAdminHelp(!showAdminHelp)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#a78bfa',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  marginTop: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                ❓ How to get your Unique ID?
+              </button>
+              {showAdminHelp && (
+                <div style={{
+                  marginTop: '12px',
+                  padding: '16px',
+                  backgroundColor: 'rgba(167, 139, 250, 0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(167, 139, 250, 0.3)',
+                  fontSize: '13px',
+                  lineHeight: '1.6'
+                }}>
+                  <div style={{ fontWeight: '600', marginBottom: '8px', color: '#a78bfa' }}>
+                    📋 How to Request Admin Unique ID:
+                  </div>
+                  <ol style={{ margin: '0', paddingLeft: '20px', color: '#d1d5db' }}>
+                    <li>Send an email to <strong style={{ color: '#10b981' }}>ayush.jena26@gmail.com</strong></li>
+                    <li>Subject: "Request for Admin Unique ID"</li>
+                    <li>Include your full name, school/organization name, and designation</li>
+                    <li>You will receive your unique ID within 24-48 hours</li>
+                  </ol>
+                  <div style={{ marginTop: '12px', padding: '8px', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '4px', color: '#fca5a5' }}>
+                    ⚠️ Note: Each Unique ID can only be registered with one email address.
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Sign Up Only: Parent Specific Fields */}
           {!isLogin && role === 'parent' && (
-            <>
-              <div className="form-group">
-                <label htmlFor="childName">Child's Name</label>
-                <input
-                  type="text"
-                  id="childName"
-                  value={childName}
-                  onChange={(e) => setChildName(e.target.value)}
-                  placeholder="Enter your child's name"
-                  required
-                />
+            <div className="form-group">
+              <label htmlFor="studentRollNo">Student's Roll Number</label>
+              <input
+                type="text"
+                id="studentRollNo"
+                value={studentRollNo}
+                onChange={(e) => setStudentRollNo(e.target.value)}
+                placeholder="Enter your child's roll number"
+                required
+              />
+              <div style={{
+                marginTop: '8px',
+                fontSize: '12px',
+                color: '#9ca3af'
+              }}>
+                ℹ️ Each roll number can only be registered with one parent email.
               </div>
-              <div className="form-group">
-                <label htmlFor="childClass">Child's Class</label>
-                <input
-                  type="text"
-                  id="childClass"
-                  value={childClass}
-                  onChange={(e) => setChildClass(e.target.value)}
-                  placeholder="e.g., 10A"
-                  required
-                />
-              </div>
-            </>
+            </div>
           )}
 
           {isLogin && (
