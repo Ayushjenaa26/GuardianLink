@@ -1,5 +1,5 @@
 GuardianLink - Parent Portal
-📖 Overview
+Overview
 GuardianLink is a comprehensive parent portal system built with React that allows parents to monitor their child's academic progress, attendance, fees, and behavior in real-time. The application provides an intuitive interface for parents to stay informed and engaged with their child's educational journey.
 
 🚀 Features
