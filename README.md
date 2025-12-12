@@ -4,7 +4,7 @@ GuardianLink is a comprehensive parent portal system built with React that allow
 
 🚀 Features
 📊 Dashboard
-Overview Cards: Quick glance at overall attendance, average grade, fee status, and academic performance
+Overview Cards: Quick glance at overall attendance, average grade, fee status, and academic performance.
 
 Recent Activity Feed: Stay updated with latest changes and notifications
 
