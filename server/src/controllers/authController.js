@@ -183,6 +183,25 @@ exports.register = async (req, res) => {
             }
         }
 
+        // Validate studentRollNo for parent registration
+        if (role.toLowerCase() === 'parent') {
+            if (!additionalFields.studentRollNo) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Student Roll Number is required'
+                });
+            }
+
+            // Check if roll number is already registered
+            const existingParent = await Parent.findOne({ studentRollNo: additionalFields.studentRollNo.trim() });
+            if (existingParent) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This Student Roll Number is already registered with another parent account'
+                });
+            }
+        }
+
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -240,9 +259,33 @@ exports.register = async (req, res) => {
 
     } catch (error) {
         console.error('Registration error:', error);
+        
+        // Handle MongoDB duplicate key errors
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            const fieldMessages = {
+                email: 'This email is already registered',
+                studentRollNo: 'This Student Roll Number is already registered with another account',
+                adminId: 'This Admin Unique ID is already in use'
+            };
+            return res.status(400).json({
+                success: false,
+                message: fieldMessages[field] || `Duplicate value for ${field}`
+            });
+        }
+        
+        // Handle validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(e => e.message);
+            return res.status(400).json({
+                success: false,
+                message: messages.join(', ')
+            });
+        }
+        
         res.status(500).json({
             success: false,
-            message: 'An error occurred during registration'
+            message: 'An error occurred during registration. Please try again.'
         });
     }
 };
@@ -410,9 +453,21 @@ exports.login = async (req, res) => {
         
         // Verify password
         try {
+            console.log('🔑 Verifying password for user:', user.email);
+            console.log('🔑 Password hash exists:', !!user.password);
+            console.log('🔑 Password provided:', !!password);
+            
             const isMatch = await bcrypt.compare(password, user.password);
+            
+            console.log('🔑 Password match result:', isMatch);
+            console.log('🔑 User object type:', user.constructor.name);
+            console.log('🔑 User password type:', typeof user.password);
+            console.log('🔑 Password provided type:', typeof password);
+            
             if (!isMatch) {
-                console.log('❌ Password verification failed');
+                console.log('❌ Password verification failed for:', user.email);
+                console.log('   Stored hash starts with:', user.password?.substring(0, 10));
+                console.log('   Provided password:', password?.substring(0, 5) + '...');
                 return res.status(401).json({ 
                     success: false,
                     message: 'Invalid email or password'
@@ -421,6 +476,8 @@ exports.login = async (req, res) => {
             console.log('✅ Password verified successfully');
         } catch (bcryptError) {
             console.error('⚠️ Bcrypt error:', bcryptError);
+            console.error('⚠️ User password:', user.password);
+            console.error('⚠️ Is bcrypt hash:', user.password?.startsWith('$2'));
             return res.status(500).json({
                 success: false,
                 message: 'Error verifying credentials'
@@ -498,190 +555,6 @@ exports.login = async (req, res) => {
                 stack: error.stack
             } : undefined
         });
-    }
-};
-
-exports.register = async (req, res) => {
-    try {
-        const { name, email, password, role, subject, classes, phone, ...additionalData } = req.body;
-
-        // Validate required fields
-        if (!name || !email || !password || !role) {
-            return res.status(400).json({ 
-                message: 'Missing required fields',
-                details: {
-                    name: !name ? 'Name is required' : null,
-                    email: !email ? 'Email is required' : null,
-                    password: !password ? 'Password is required' : null,
-                    role: !role ? 'Role is required' : null
-                }
-            });
-        }
-
-        // Email format validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                message: 'Invalid email format'
-            });
-        }
-
-        // Password validation
-        if (password.length < 6) {
-            return res.status(400).json({
-                message: 'Password must be at least 6 characters long'
-            });
-        }
-
-        // Validate role
-        const validRoles = ['teacher', 'student', 'admin'];
-        if (!validRoles.includes(role)) {
-            return res.status(400).json({ 
-                message: 'Invalid role specified',
-                validRoles: validRoles
-            });
-        }
-
-        // Check if user already exists for any role
-        const existingUser = await Promise.all([
-            Teacher.findOne({ email }),
-            Student.findOne({ email }),
-            Admin.findOne({ email })
-        ]);
-
-        if (existingUser.some(user => user !== null)) {
-            return res.status(400).json({
-                message: 'Email already registered'
-            });
-        }
-
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        let user;
-        // Create user based on role
-        switch (role) {
-            case 'teacher':
-                user = new Teacher({
-                    name,
-                    email,
-                    password: hashedPassword,
-                    subject: subject || 'General',
-                    classes: classes || ['All'],
-                    phone: phone || '0000000000'
-                });
-                break;
-            case 'student':
-                // Validate student-specific fields
-                const requiredStudentFields = ['class', 'section', 'admissionNumber'];
-                const missingFields = requiredStudentFields.filter(field => !additionalData[field]);
-                if (missingFields.length > 0) {
-                    return res.status(400).json({
-                        message: 'Missing required student fields',
-                        missingFields: missingFields
-                    });
-                }
-                user = new Student({
-                    name,
-                    email,
-                    password: hashedPassword,
-                    ...additionalData
-                });
-                break;
-            case 'admin':
-                user = new Admin({
-                    name,
-                    email,
-                    password: hashedPassword
-                });
-                break;
-        }
-
-        try {
-            // Save the user
-            await user.save();
-
-            // Create JWT payload with role-specific data
-            const payload = {
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    role: role
-                }
-            };
-
-            // Sign the JWT token
-            jwt.sign(
-                payload,
-                process.env.JWT_SECRET,
-                { expiresIn: '24h' },
-                (err, token) => {
-                    if (err) throw err;
-                    res.status(201).json({
-                        token,
-                        user: {
-                            id: user._id,
-                            name: user.name,
-                            email: user.email,
-                            role: role
-                        }
-                    });
-                }
-            );
-        } catch (error) {
-            console.error('❌ Auth error:', error);
-            if (error.name === 'ValidationError') {
-                return res.status(400).json({
-                    message: 'Validation failed',
-                    errors: Object.values(error.errors).map(err => ({
-                        field: err.path,
-                        message: err.message
-                    }))
-                });
-            }
-            throw error;
-        }
-        const payload = {
-            user: {
-                id: user._id,
-                role: role,
-                name: user.name,
-                email: user.email
-            }
-        };
-
-        // Sign and return JWT
-        jwt.sign(
-            payload,
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' },
-            (err, token) => {
-                if (err) {
-                    console.error('JWT signing error:', err);
-                    throw err;
-                }
-                
-                const response = {
-                    success: true,
-                    token,
-                    user: {
-                        id: user._id,
-                        name: user.name,
-                        email: user.email,
-                        role: role
-                    }
-                };
-                
-                console.log('Sending successful response:', response);
-                res.status(200).json(response);
-            }
-        );
-
-    } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).json({ message: 'Server error during registration' });
     }
 };
 

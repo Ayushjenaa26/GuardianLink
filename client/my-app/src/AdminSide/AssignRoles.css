@@ -1,0 +1,321 @@
+/* AssignRoles.css */
+
+:root {
+  /* Dark Theme Palette matching the image */
+  --bg-dark: #0f111f;       /* Deep Navy Background */
+  --bg-card: #ffffff;       /* White containers */
+  
+  --primary: #8b5cf6;       /* Violet accent */
+  --primary-dark: #7c3aed;
+  
+  --text-main: #f8fafc;     /* White text for dark bg */
+  --text-muted: #94a3b8;    /* Light grey for subtext */
+  
+  --card-text-main: #1e293b; /* Dark text inside white cards */
+  --card-text-sub: #64748b;
+  
+  --border-color: #e2e8f0;
+  --radius: 12px;
+}
+
+/* 1. Main Container - Transparent to show parent dark bg */
+.assign-roles-container {
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+  min-height: 100%;
+}
+
+/* 2. Header Section - Adapted for Dark Mode */
+.assign-roles-header {
+  margin-bottom: 32px;
+}
+
+.assign-roles-header h2 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #ffffff; /* Explicitly white */
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Icon style in header */
+.assign-roles-header h2 svg, 
+.assign-roles-header h2 i {
+  color: var(--primary);
+}
+
+.assign-roles-header p {
+  color: var(--text-muted); /* Light grey */
+  font-size: 0.95rem;
+}
+
+/* 3. Search Bar - White Floating Bar */
+.assign-search-bar {
+  margin-bottom: 32px;
+}
+
+.assign-search-bar input {
+  width: 100%;
+  padding: 16px 24px;
+  padding-left: 50px; /* Space for search icon */
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: var(--bg-card); /* White */
+  color: var(--card-text-main);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: all 0.2s ease;
+  
+  /* Add Search Icon via background if you don't have an SVG wrapper */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  background-size: 20px;
+}
+
+.assign-search-bar input::placeholder {
+  color: #94a3b8;
+}
+
+.assign-search-bar input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4); /* Glow effect */
+}
+
+/* 4. Teacher Cards - White Cards on Dark Background */
+.assign-teachers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.teacher-card {
+  background: var(--bg-card); /* White */
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: none; /* Removed border for cleaner look */
+}
+
+.teacher-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); /* Stronger shadow on dark bg */
+}
+
+.teacher-card-header {
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.teacher-avatar {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.teacher-info h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--card-text-main);
+}
+
+.teacher-info .teacher-id {
+  font-size: 0.85rem;
+  color: var(--card-text-sub);
+}
+
+.teacher-card-body {
+  padding: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  color: var(--card-text-sub);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.info-row .value {
+  color: var(--card-text-main);
+  font-weight: 600;
+}
+
+.teacher-card-footer {
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-top: 1px solid var(--border-color);
+}
+
+.assign-btn {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.assign-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* 5. Empty State - Matching the Big White Box in image */
+.assign-empty {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  min-height: 400px; /* Match height in image */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.assign-empty .empty-icon {
+  font-size: 5rem;
+  margin-bottom: 24px;
+  opacity: 0.2; /* Faded styling */
+  color: #64748b;
+}
+
+.assign-empty h3 {
+  color: #1e293b;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.assign-empty p {
+  color: #64748b;
+  max-width: 400px;
+}
+
+/* 6. Modal Styles (Keep Light for Contrast) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7); /* Darker dim */
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.assign-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: #f8fafc;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+}
+
+.close-btn {
+  background: transparent;
+  color: #64748b;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+/* Rest of modal internals (same as previous optimized version) */
+.modal-body { padding: 24px; }
+.form-group label { color: #1e293b; font-weight: 600; margin-bottom: 8px; display: block; }
+.form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
+
+/* Checkboxes / Chips */
+.classes-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.class-checkbox span {
+  padding: 6px 14px;
+  background: #f1f5f9;
+  border-radius: 20px;
+  color: #475569;
+  font-size: 0.9rem;
+  transition: 0.2s;
+  border: 1px solid transparent;
+}
+.class-checkbox input:checked + span {
+  background: var(--primary);
+  color: white;
+  font-weight: 500;
+}
+
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancel-btn {
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-btn:hover { background: var(--primary-dark); }

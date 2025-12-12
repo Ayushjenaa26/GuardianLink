@@ -18,4 +18,9 @@ router.delete('/teachers/:id', protect, adminOnly, adminController.deleteTeacher
 // Get upload statistics
 router.get('/stats', protect, adminOnly, adminController.getStats);
 
+// Assign roles/classes to teachers
+router.put('/teachers/:id/assign', protect, adminOnly, adminController.assignToTeacher);
+router.get('/classes', protect, adminOnly, adminController.getAvailableClasses);
+router.get('/subjects', protect, adminOnly, adminController.getAvailableSubjects);
+
 module.exports = router;

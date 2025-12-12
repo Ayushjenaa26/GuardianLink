@@ -6,6 +6,7 @@ import StudentAdmin from './StudentAdmin';
 import Teachers from './TeacherAdmin';
 import FeeManagement from './FeeManagement';
 import DataUpload from './DataUpload';
+import AssignRoles from './AssignRoles';
 import { API_URL } from '../config';
 
 function AdminDashboard({ onSignOut }) {
@@ -218,6 +219,13 @@ function AdminDashboard({ onSignOut }) {
           >
             <span role="img" aria-label="upload">📤</span> Data Upload
           </button>
+          <button
+            className={activeSection === 'assign' ? 'active' : ''}
+            onClick={() => setActiveSection('assign')}
+            aria-label="Assign Roles"
+          >
+            <span role="img" aria-label="assign">👥</span> Assign Roles
+          </button>
         </nav>
         <div className="parent-user">
           <div className="parent-avatar" style={{background:'#a855f7'}}> 
@@ -239,6 +247,7 @@ function AdminDashboard({ onSignOut }) {
         {activeSection === 'teachers' && <Teachers embedded={true} />}
         {activeSection === 'fee' && <FeeManagement embedded={true} />}
         {activeSection === 'upload' && <DataUpload embedded={true} />}
+        {activeSection === 'assign' && <AssignRoles embedded={true} />}
       </main>
     </div>
   );

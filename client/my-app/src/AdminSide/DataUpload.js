@@ -14,7 +14,7 @@ function DataUpload({ embedded }) {
 
   // Expected columns for students and teachers
   const studentColumns = ['Student Name', 'Roll No', 'Email', 'Class', 'Year', 'Batch', 'GPA', 'Status'];
-  const teacherColumns = ['Teacher Name', 'Employee ID', 'Email', 'Subject', 'Classes', 'Phone', 'Department', 'Experience', 'Status'];
+  const teacherColumns = ['Teacher Name', 'Employee ID', 'Email', 'Subject', 'Phone', 'Department', 'Experience', 'Status'];
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
@@ -106,14 +106,22 @@ function DataUpload({ embedded }) {
     setUploadProgress(0);
 
     try {
-      // Prepare data for upload
+      // Prepare data for upload - trim headers and cell values
+      const trimmedHeaders = previewData.headers.map(h => (typeof h === 'string' ? h.trim() : h));
+      
       const formattedData = previewData.allRows.map(row => {
         const record = {};
-        previewData.headers.forEach((header, index) => {
-          record[header] = row[index] || '';
+        trimmedHeaders.forEach((header, index) => {
+          const value = row[index];
+          // Trim string values
+          const trimmedValue = typeof value === 'string' ? value.trim() : (value || '');
+          record[header] = trimmedValue;
         });
         return record;
       });
+
+      console.log('📋 First row of formatted data:', formattedData[0]);
+      console.log('📋 Headers:', trimmedHeaders);
 
       // Simulate progress
       const progressInterval = setInterval(() => {
@@ -150,16 +158,18 @@ function DataUpload({ embedded }) {
           setUploadProgress(0);
         }, 2000);
       } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Upload failed with status:', response.status, 'Message:', errorData.message);
         setUploadStatus({ 
           type: 'error', 
-          message: result.message || 'Upload failed. Please try again.' 
+          message: errorData.message || `Upload failed (Error ${response.status}). Please try again.` 
         });
       }
     } catch (error) {
       console.error('Upload error:', error);
       setUploadStatus({ 
         type: 'error', 
-        message: 'Network error. Please check your connection and try again.' 
+        message: error.message || 'Network error. Please check your connection and try again.' 
       });
     } finally {
       setIsUploading(false);
@@ -170,7 +180,7 @@ function DataUpload({ embedded }) {
     const columns = activeTab === 'students' ? studentColumns : teacherColumns;
     const sampleData = activeTab === 'students' 
       ? [['John Doe', 'STU001', 'john@example.com', '10th', '2024', 'A', '3.8', 'Active']]
-      : [['Jane Smith', 'TCH001', 'jane@example.com', 'Mathematics', 'Class 10A, Class 10B', '9876543210', 'Science', '5 Years', 'Active']];
+      : [['Jane Smith', 'TCH001', 'jane@example.com', 'Mathematics', '9876543210', 'Science', '5 Years', 'Active']];
 
     const ws = XLSX.utils.aoa_to_sheet([columns, ...sampleData]);
     const wb = XLSX.utils.book_new();

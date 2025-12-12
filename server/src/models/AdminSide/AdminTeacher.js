@@ -35,7 +35,6 @@ const adminTeacherSchema = new mongoose.Schema({
   },
   classes: {
     type: String,
-    required: [true, 'Classes are required'],
     trim: true
   },
   phone: {
@@ -54,6 +53,22 @@ const adminTeacherSchema = new mongoose.Schema({
     type: String,
     enum: ['Active', 'Inactive', 'On Leave', 'Resigned'],
     default: 'Active'
+  },
+  // Assigned classes and subjects by admin
+  assignedClasses: [{
+    type: String,
+    trim: true
+  }],
+  assignedSubjects: [{
+    type: String,
+    trim: true
+  }],
+  lastAssignedAt: {
+    type: Date
+  },
+  assignedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin'
   },
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,

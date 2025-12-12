@@ -299,6 +299,27 @@ const AuthPage = () => {
           </div>
         )}
 
+        {error && (
+          <div style={{
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '16px',
+            borderRadius: '8px',
+            marginBottom: '24px',
+            border: '1px solid #f5c6cb',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '10px',
+            fontWeight: '500'
+          }}>
+            <span style={{ fontSize: '18px' }}>❌</span>
+            <div>
+              <div style={{ fontWeight: '600', marginBottom: '4px' }}>Error</div>
+              <div style={{ fontSize: '14px' }}>{error}</div>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="auth-form">
           {/* Sign Up Only: Name Field */}
           {!isLogin && (
@@ -386,25 +407,23 @@ const AuthPage = () => {
             </>
           )}
 
-          {/* Sign Up Only: Role Selection */}
-          {!isLogin && (
-            <div className="form-group">
-              <label htmlFor="role">Select Your Role</label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="form-select"
-                required
-              >
-                {roles.map((roleOption) => (
-                  <option key={roleOption.id} value={roleOption.id}>
-                    {roleOption.icon} {roleOption.title} - {roleOption.description}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          {/* Role Selection - Show for both Sign In and Sign Up */}
+          <div className="form-group">
+            <label htmlFor="role">Select Your Role</label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="form-select"
+              required
+            >
+              {roles.map((roleOption) => (
+                <option key={roleOption.id} value={roleOption.id}>
+                  {roleOption.icon} {roleOption.title}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Sign Up Only: Phone Number (for all roles) */}
           {!isLogin && (
