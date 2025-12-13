@@ -1,0 +1,361 @@
+/* RequestRoles.css */
+
+:root {
+  /* Dark Navy Background */
+  --bg-dark: #0b0e1b;
+  
+  /* Accent Colors */
+  --primary: #7c3aed;       /* Vivid Violet */
+  --primary-hover: #6d28d9;
+  --secondary: #eff6ff;     /* Light Blue for Info */
+  
+  /* Status Colors */
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+
+  /* Text Colors */
+  --text-main: #ffffff;     /* White text (for dark bg) */
+  --text-card: #1e293b;     /* Dark text (for white card) */
+  --text-muted: #64748b;    /* Grey text */
+  
+  --border-color: #e2e8f0;
+  --radius: 20px;           /* Rounded corners matching screenshot */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* --- Main Layout --- */
+.request-roles-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Typography (Outside White Box) --- */
+.request-roles-container h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.request-roles-container h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 48px;
+  margin-bottom: 24px;
+  color: white; /* Title on dark bg */
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- The Main White Card --- */
+.request-form-section {
+  background: #ffffff;
+  border-radius: var(--radius);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 40px;
+  color: var(--text-card);
+}
+
+/* --- Info Note (Blue Box) --- */
+.info-note {
+  background: #eff6ff; /* Light Blue */
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.info-icon {
+  background: #3b82f6; /* Blue Icon Bg */
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-note p {
+  margin: 0;
+  color: #1e40af; /* Dark Blue Text */
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* --- Form Elements --- */
+.form-group {
+  margin-bottom: 30px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+/* Subject Selection Grid 
+   Matches the purple buttons in screenshot 
+*/
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.checkbox-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Hover State */
+.checkbox-label:hover {
+  border-color: var(--primary);
+  background: #fdfbff;
+  transform: translateY(-2px);
+}
+
+/* Hide Default Checkbox */
+.checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Selected State (Purple) */
+.checkbox-label:has(input:checked) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+/* Fallback for older browsers */
+.checkbox-label input:checked + span,
+.checkbox-label.checked { 
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+/* Textarea */
+.form-group textarea {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  background: #ffffff;
+  transition: all 0.2s;
+  min-height: 120px;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+.form-group textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Submit Button */
+.btn-submit {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary); /* Solid Purple */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.4);
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px -1px rgba(124, 58, 237, 0.5);
+}
+
+.btn-submit:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* --- My Requests Section (Cards on Dark Bg) --- */
+.no-requests {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 40px;
+  text-align: center;
+  border-radius: var(--radius);
+}
+
+.requests-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.request-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  transition: transform 0.2s;
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.request-card:hover {
+  transform: translateY(-5px);
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-pending { background: #fff7ed; color: #c2410c; }
+.status-approved { background: #f0fdf4; color: #15803d; }
+.status-rejected { background: #fef2f2; color: #b91c1c; }
+
+.request-date {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.request-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.detail-item strong {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tag-subject {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.request-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  text-align: right;
+}
+
+.btn-delete {
+  background: white;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .request-form-section {
+    padding: 24px;
+  }
+  
+  .checkbox-grid {
+    gap: 8px;
+  }
+  
+  .checkbox-label {
+    flex: 1;
+    font-size: 0.85rem;
+  }
+}

@@ -28,6 +28,8 @@ function Students({ embedded = false }) {
         return;
       }
       
+      console.log('Fetching students with token:', token?.substring(0, 20) + '...');
+      
       const response = await fetch(`${API_URL}/api/admin/students`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -35,17 +37,24 @@ function Students({ embedded = false }) {
         }
       });
 
+      console.log('Response status:', response.status);
+
       if (response.status === 401 || response.status === 403) {
+        const errorData = await response.json();
+        console.error('Auth error:', errorData);
         setError('Not authorized. Please log in as admin.');
         setLoading(false);
         return;
       }
 
       if (!response.ok) {
-        throw new Error('Failed to fetch students');
+        const errorData = await response.json();
+        console.error('Fetch error:', errorData);
+        throw new Error(errorData.message || 'Failed to fetch students');
       }
 
       const data = await response.json();
+      console.log('Students data received:', data);
       
       // Map database fields to component fields
       const mappedStudents = (data.students || []).map(student => ({
@@ -67,7 +76,7 @@ function Students({ embedded = false }) {
       setError(''); // Clear any previous errors
     } catch (err) {
       console.error('Error fetching students:', err);
-      setError('Failed to load students. Please try again.');
+      setError(err.message || 'Failed to load students. Please try again.');
     } finally {
       setLoading(false);
     }

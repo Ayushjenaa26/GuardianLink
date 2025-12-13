@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 import ReportAdmin from './ReportAdmin';
-import StudentAdmin from './StudentAdmin';
+import Students from './StudentAdmin';
 import Teachers from './TeacherAdmin';
 import FeeManagement from './FeeManagement';
 import DataUpload from './DataUpload';
@@ -243,7 +243,7 @@ function AdminDashboard({ onSignOut }) {
         {/* Render Dashboard, Reports, or Students without duplicate layouts */}
         {activeSection === 'dashboard' && renderDashboardContent()}
         {activeSection === 'reports' && <ReportAdmin embedded={true} />}
-        {activeSection === 'students' && <StudentAdmin embedded={true} />}
+        {activeSection === 'students' && <Students embedded={true} />}
         {activeSection === 'teachers' && <Teachers embedded={true} />}
         {activeSection === 'fee' && <FeeManagement embedded={true} />}
         {activeSection === 'upload' && <DataUpload embedded={true} />}

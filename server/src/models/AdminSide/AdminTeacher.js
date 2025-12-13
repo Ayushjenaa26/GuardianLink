@@ -63,6 +63,10 @@ const adminTeacherSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  semester: {
+    type: String,
+    trim: true
+  },
   lastAssignedAt: {
     type: Date
   },

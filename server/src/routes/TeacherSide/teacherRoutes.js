@@ -3,6 +3,7 @@ const router = express.Router();
 const authMiddleware = require('../../middleware/TeacherSide/auth');
 const studentController = require('../../controllers/TeacherSide/StudentController');
 const dashboardController = require('../../controllers/TeacherSide/dashboardController');
+const roleRequestController = require('../../controllers/AdminSide/roleRequestController');
 const { check } = require('express-validator');
 const Student = require('../../models/Student');
 
@@ -116,5 +117,10 @@ router.get('/marks/student/:studentId', authMiddleware, marksController.getStude
 router.put('/marks/:marksId', authMiddleware, marksController.updateMarks);
 router.delete('/marks/:marksId', authMiddleware, marksController.deleteMarks);
 router.get('/marks/stats', authMiddleware, marksController.getClassStats);
+
+// Role request routes (teacher side)
+router.post('/role-request', authMiddleware, roleRequestController.createRoleRequest);
+router.get('/role-requests', authMiddleware, roleRequestController.getTeacherRoleRequests);
+router.delete('/role-requests/:id', authMiddleware, roleRequestController.deleteRoleRequest);
 
 module.exports = router;

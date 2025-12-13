@@ -384,9 +384,9 @@ exports.getStats = async (req, res) => {
 exports.assignToTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-    const { classes, subjects } = req.body;
+    const { classes, subjects, semester } = req.body;
 
-    console.log(`📝 Assigning to teacher ${id}:`, { classes, subjects });
+    console.log(`📝 Assigning to teacher ${id}:`, { classes, subjects, semester });
 
     // Find and update the teacher
     const teacher = await AdminTeacher.findById(id);
@@ -395,9 +395,10 @@ exports.assignToTeacher = async (req, res) => {
       return res.status(404).json({ message: 'Teacher not found' });
     }
 
-    // Update teacher's assigned classes and subjects
+    // Update teacher's assigned classes, subjects, and semester
     teacher.assignedClasses = classes || [];
     teacher.assignedSubjects = subjects || [];
+    if (semester) teacher.semester = semester;
     teacher.lastAssignedAt = new Date();
     teacher.assignedBy = req.user?.id;
 
@@ -413,7 +414,8 @@ exports.assignToTeacher = async (req, res) => {
         employeeId: teacher.employeeId,
         email: teacher.email,
         assignedClasses: teacher.assignedClasses,
-        assignedSubjects: teacher.assignedSubjects
+        assignedSubjects: teacher.assignedSubjects,
+        semester: teacher.semester
       }
     });
 

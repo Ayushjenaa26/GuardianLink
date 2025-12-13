@@ -7,6 +7,7 @@ import MyStudents from './MyStudents';
 import MarksKT from './MarksKt';
 import BehaviorReports from './BehaviorReports';
 import StudentDataInput from './StudentDataInput';
+import RequestRoles from './RequestRoles';
 import { API_URL } from '../config';
 
 function TeacherDashboard() {
@@ -238,6 +239,12 @@ function TeacherDashboard() {
             <StudentDataInput />
           </div>
         );
+      case 'request-roles':
+        return (
+          <div className="content-container">
+            <RequestRoles />
+          </div>
+        );
       default:
         return (
           <div className="content-container">
@@ -316,6 +323,12 @@ function TeacherDashboard() {
               onClick={() => setActiveSection('behavior')}
             >
               <span>📈</span> Behavior Analytics
+            </button>
+            <button 
+              className={activeSection === 'request-roles' ? 'active' : ''} 
+              onClick={() => setActiveSection('request-roles')}
+            >
+              <span>📋</span> Request Roles
             </button>
           </nav>
 
