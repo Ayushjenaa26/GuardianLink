@@ -125,8 +125,8 @@ exports.deleteMarks = async (req, res) => {
   }
 };
 
-// Get class performance statistics
-exports.getClassStats = async (req, res) => {
+// Get branch performance statistics
+exports.getBranchStats = async (req, res) => {
   try {
     const { subject, examType, semester } = req.query;
     const teacherId = req.user.id;
@@ -162,7 +162,7 @@ exports.getClassStats = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching class statistics',
+      message: 'Error fetching branch statistics',
       error: error.message
     });
   }

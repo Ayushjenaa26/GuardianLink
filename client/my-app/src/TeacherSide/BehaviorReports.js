@@ -61,7 +61,7 @@ const BehaviorReports = () => {
         participation: 'High',
         issues: [],
         lastIncident: 'None',
-        classDisruptions: 0,
+        disruptions: 0,
         homeworkCompletion: 98,
         overallRating: 'Excellent',
         trends: 'improving',
@@ -76,7 +76,7 @@ const BehaviorReports = () => {
         participation: 'High',
         issues: [],
         lastIncident: 'None',
-        classDisruptions: 0,
+        disruptions: 0,
         homeworkCompletion: 95,
         overallRating: 'Very Good',
         trends: 'consistent',
@@ -91,7 +91,7 @@ const BehaviorReports = () => {
         participation: 'Medium',
         issues: ['Late submissions', 'Distracts neighbors'],
         lastIncident: '2 days ago',
-        classDisruptions: 3,
+        disruptions: 3,
         homeworkCompletion: 75,
         overallRating: 'Needs Improvement',
         trends: 'declining',
@@ -106,7 +106,7 @@ const BehaviorReports = () => {
         participation: 'Very High',
         issues: [],
         lastIncident: 'None',
-        classDisruptions: 0,
+        disruptions: 0,
         homeworkCompletion: 100,
         overallRating: 'Excellent',
         trends: 'improving',
@@ -119,14 +119,14 @@ const BehaviorReports = () => {
         behaviorScore: 2.8,
         attentiveness: 'Poor',
         participation: 'Low',
-        issues: ['Frequent absences', 'Class disruptions', 'Incomplete work'],
+        issues: ['Frequent absences', 'Session disruptions', 'Incomplete work'],
         lastIncident: 'Today',
-        classDisruptions: 8,
+        disruptions: 8,
         homeworkCompletion: 60,
         overallRating: 'Concern',
         trends: 'declining',
         strengths: ['Technical skills'],
-        improvements: ['Attendance', 'Class behavior', 'Homework completion']
+        improvements: ['Attendance', 'Session behavior', 'Homework completion']
       }
     ],
     'B2': [
@@ -138,7 +138,7 @@ const BehaviorReports = () => {
         participation: 'Medium',
         issues: ['Occasionally late'],
         lastIncident: '1 week ago',
-        classDisruptions: 1,
+        disruptions: 1,
         homeworkCompletion: 88,
         overallRating: 'Good',
         trends: 'improving',
@@ -154,7 +154,7 @@ const BehaviorReports = () => {
       id: 1,
       student: 'Aswin Kumar',
       batch: 'B1',
-      type: 'Class Disruption',
+      type: 'Session Disruption',
       severity: 'Medium',
       date: 'Today, 10:30 AM',
       description: 'Repeatedly talking during lecture, distracting other students',
@@ -179,7 +179,7 @@ const BehaviorReports = () => {
       type: 'Absenteeism',
       severity: 'High',
       date: '1 week ago',
-      description: 'Missed 3 consecutive classes without notice',
+      description: 'Missed 3 consecutive sessions without notice',
       actionTaken: 'Parent meeting scheduled',
       status: 'Pending'
     }
@@ -244,7 +244,7 @@ const BehaviorReports = () => {
       <div className="behavior-header">
         <div className="header-content">
           <h1>Behavior Reports</h1>
-          <p>Monitor student behavior, attentiveness, and classroom conduct</p>
+          <p>Monitor student behavior, attentiveness, and conduct</p>
         </div>
         <div className="header-actions">
           <button className="btn-primary">📝 Log New Incident</button>
@@ -345,7 +345,7 @@ const BehaviorReports = () => {
                 {currentBatch.topPerformers}
               </div>
               <div className="metric-label">Well-Behaved Students</div>
-              <div className="metric-trend positive">85% of class</div>
+              <div className="metric-trend positive">85% of branch</div>
             </div>
             <div className="metric-card">
               <div className="metric-value" style={{ color: '#f59e0b' }}>
@@ -462,7 +462,7 @@ const BehaviorReports = () => {
                     <th>Behavior Score</th>
                     <th>Attentiveness</th>
                     <th>Participation</th>
-                    <th>Class Disruptions</th>
+                    <th>Session Disruptions</th>
                     <th>Homework Completion</th>
                     <th>Overall Rating</th>
                     <th>Trend</th>
@@ -501,7 +501,7 @@ const BehaviorReports = () => {
                       </td>
                       <td>
                         <div className="disruptions-count">
-                          {student.classDisruptions}
+                          {student.disruptions}
                         </div>
                       </td>
                       <td>
@@ -573,8 +573,8 @@ const BehaviorReports = () => {
                   <div className="summary-value">{selectedStudentData.participation}</div>
                 </div>
                 <div className="summary-card">
-                  <h4>Class Disruptions</h4>
-                  <div className="summary-value">{selectedStudentData.classDisruptions}</div>
+                  <h4>Session Disruptions</h4>
+                  <div className="summary-value">{selectedStudentData.disruptions}</div>
                 </div>
               </div>
 

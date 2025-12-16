@@ -67,7 +67,7 @@ const StudentDataInput = () => {
       const formattedEntries = data.map(student => ({
         id: student.admissionNumber || student.studentId,
         name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim(),
-        batch: student.class || student.batch,
+        batch: student.branch || student.batch,
         date: new Date(student.createdAt).toLocaleDateString(),
         initials: student.name ? student.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'ST'
       }));
@@ -95,7 +95,7 @@ const StudentDataInput = () => {
       const formattedStudents = data.map(student => ({
         id: student.admissionNumber || student.studentId,
         name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim(),
-        batch: student.class || student.batch,
+        batch: student.branch || student.batch,
         section: student.section || student.department,
         email: student.email,
         date: new Date(student.createdAt).toLocaleDateString(),
@@ -239,7 +239,7 @@ const StudentDataInput = () => {
         name: `${formData.firstName} ${formData.lastName}`.trim(),
         email: formData.email.trim(),
         password: formData.studentId.trim(),
-        class: formData.batch,
+        branch: formData.batch,
         section: formData.department,
         admissionNumber: formData.studentId.trim(),
         parentName: formData.parentName.trim(),
@@ -248,7 +248,7 @@ const StudentDataInput = () => {
       };
 
       // Validate required fields again just to be safe
-      const requiredFields = ['name', 'email', 'password', 'class', 'section', 'admissionNumber', 'parentName', 'parentPhone'];
+      const requiredFields = ['name', 'email', 'password', 'branch', 'section', 'admissionNumber', 'parentName', 'parentPhone'];
       for (const field of requiredFields) {
         if (!studentData[field]) {
           throw new Error(`${field} is required`);

@@ -132,7 +132,7 @@ const MyStudents = () => {
       <div className="students-header">
         <div className="header-content">
           <h1>My Students</h1>
-          <p>Manage and monitor all students across your classes</p>
+          <p>Manage and monitor all students across your branches</p>
         </div>
         <div className="header-stats">
           <div className="stat-item">

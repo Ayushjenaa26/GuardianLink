@@ -25,8 +25,7 @@ router.post(
     '/login',
     [
         check('email', 'Please include a valid email').isEmail(),
-        check('password', 'Password is required').exists(),
-        check('role', 'Role is required').isIn(['student', 'teacher', 'admin', 'parent'])
+        check('password', 'Password is required').exists()
     ],
     authController.login
 );

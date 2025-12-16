@@ -33,7 +33,7 @@ const adminTeacherSchema = new mongoose.Schema({
     required: [true, 'Subject is required'],
     trim: true
   },
-  classes: {
+  branches: {
     type: String,
     trim: true
   },
@@ -54,8 +54,8 @@ const adminTeacherSchema = new mongoose.Schema({
     enum: ['Active', 'Inactive', 'On Leave', 'Resigned'],
     default: 'Active'
   },
-  // Assigned classes and subjects by admin
-  assignedClasses: [{
+  // Assigned branches and subjects by admin
+  assignedBranches: [{
     type: String,
     trim: true
   }],

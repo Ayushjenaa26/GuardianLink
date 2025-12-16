@@ -23,7 +23,7 @@ const roleRequestSchema = new mongoose.Schema({
     enum: ['CSE', 'ECE', 'EEE', 'ME', 'CE', 'ChE'],
     required: true
   },
-  requestedClasses: [{
+  requestedBranches: [{
     type: String,
     trim: true
   }],

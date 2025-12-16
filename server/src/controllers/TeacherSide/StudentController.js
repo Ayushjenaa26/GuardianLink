@@ -1,5 +1,5 @@
-const Student = require('../../models/Student');
-const Teacher = require('../../models/TeacherSide/Teacher');
+const AdminStudent = require('../../models/AdminSide/AdminStudent');
+const AdminTeacher = require('../../models/AdminSide/AdminTeacher');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
@@ -30,7 +30,7 @@ exports.createStudent = async (req, res) => {
             name,
             email,
             password,
-            class: studentClass,
+            branch,
             section,
             admissionNumber,
             parentName,
@@ -39,10 +39,10 @@ exports.createStudent = async (req, res) => {
         } = req.body;
 
         // Check if student already exists
-        const existingStudent = await Student.findOne({
+        const existingStudent = await AdminStudent.findOne({
             $or: [
                 { email: email.toLowerCase() },
-                { admissionNumber }
+                { rollNo: admissionNumber }
             ]
         });
 
@@ -59,17 +59,19 @@ exports.createStudent = async (req, res) => {
         console.log('✅ Creating new student...');
         
         // Create new student
-        const student = new Student({
-            name,
+        const student = new AdminStudent({
+            studentName: name,
             email: email.toLowerCase(),
             password, // Password will be hashed by the pre-save hook
-            class: studentClass,
-            section,
-            admissionNumber,
-            parentName,
-            parentPhone,
-            healthInfo,
-            createdBy: teacherId
+            branch,
+            // section, // Not in AdminStudent schema
+            rollNo: admissionNumber,
+            // parentName, // Not in AdminStudent schema
+            // parentPhone, // Not in AdminStudent schema
+            // healthInfo, // Not in AdminStudent schema
+            uploadedBy: teacherId,
+            year: '1', // Default
+            batch: new Date().getFullYear().toString() // Default
         });
 
         // Save the student to database

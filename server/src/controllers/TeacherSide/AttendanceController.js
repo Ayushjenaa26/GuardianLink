@@ -17,7 +17,7 @@ exports.markAttendance = async (req, res) => {
       status,
       remarks,
       markedBy: teacherId,
-      class: req.body.class
+      branch: req.body.branch
     });
 
     await attendance.save();
@@ -37,15 +37,15 @@ exports.markAttendance = async (req, res) => {
   }
 };
 
-// Get attendance for a class
+// Get attendance for a branch
 exports.getClassAttendance = async (req, res) => {
   try {
-    const { date, class: className } = req.query;
+    const { date, branch } = req.query;
     const teacherId = req.user.id;
 
     const query = { 
       markedBy: teacherId,
-      class: className
+      branch: branch
     };
 
     if (date) {

@@ -6,7 +6,7 @@ const attendanceSchema = new mongoose.Schema({
     ref: 'Student',
     required: true
   },
-  class: {
+  branch: {
     type: String,
     required: true
   },

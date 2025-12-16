@@ -16,12 +16,19 @@ router.get('/teachers', protect, adminOnly, adminController.getAllTeachers);
 router.delete('/students/:id', protect, adminOnly, adminController.deleteStudent);
 router.delete('/teachers/:id', protect, adminOnly, adminController.deleteTeacher);
 
+// Update student and teacher
+router.put('/students/:id', protect, adminOnly, adminController.updateStudent);
+router.put('/teachers/:id', protect, adminOnly, adminController.updateTeacher);
+
+// Clear all students
+router.delete('/students', protect, adminOnly, adminController.clearAllStudents);
+
 // Get upload statistics
 router.get('/stats', protect, adminOnly, adminController.getStats);
 
-// Assign roles/classes to teachers
+// Assign roles/branches to teachers
 router.put('/teachers/:id/assign', protect, adminOnly, adminController.assignToTeacher);
-router.get('/classes', protect, adminOnly, adminController.getAvailableClasses);
+router.get('/branches', protect, adminOnly, adminController.getAvailableBranches);
 router.get('/subjects', protect, adminOnly, adminController.getAvailableSubjects);
 
 // Role request routes (admin side)

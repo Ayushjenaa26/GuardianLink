@@ -22,7 +22,7 @@ const TeacherAttendance = () => {
   // Hardcoded student data from database
   const allStudents = [
     // B1 - Full Stack Development
-    { id: '16010123071', firstName: 'ARJJEET', lastName: 'PAUL', class: 'B1 - Full Stack Development' },
+    { id: '16010123071', firstName: 'ARJJEET', lastName: 'PAUL', branch: 'B1 - Full Stack Development' },
     { id: '16010123072', firstName: 'ARNAB', lastName: 'BHOWMIH', class: 'B1 - Full Stack Development' },
     { id: '16010123073', firstName: 'ARNAV', lastName: 'WAGHDH', class: 'B1 - Full Stack Development' },
     { id: '16010123074', firstName: 'ARNAV', lastName: 'VAVRE', class: 'B1 - Full Stack Development' },
@@ -111,13 +111,13 @@ const TeacherAttendance = () => {
       // Filter by selected class if needed
       let filteredStudents = studentsData;
       if (selectedClass !== 'all') {
-        filteredStudents = studentsData.filter(s => s.class === selectedClass);
+        filteredStudents = studentsData.filter(s => (s.branch || s.class) === selectedClass);
       }
 
       // Get unique classes for sections
-      const uniqueClasses = [...new Set(studentsData.map(s => s.class))];
+      const uniqueClasses = [...new Set(studentsData.map(s => s.branch || s.class))];
       const sectionsData = uniqueClasses.map(className => {
-        const classStudents = studentsData.filter(s => s.class === className);
+        const classStudents = studentsData.filter(s => (s.branch || s.class) === className);
         const avgAttendance = classStudents.reduce((sum, s) => sum + (s.attendance || 0), 0) / classStudents.length;
         return {
           name: className,
@@ -185,7 +185,7 @@ const TeacherAttendance = () => {
         return {
           name: `${student.firstName} ${student.lastName}`,
           id: student.studentId,
-          class: student.class,
+          branch: student.branch || student.class,
           attendance: attendanceRecord,
           absences: absences,
           late: lateArrivals,
@@ -201,7 +201,7 @@ const TeacherAttendance = () => {
           students: detailedData.map(student => ({
             name: student.name,
             id: student.id,
-            class: student.class,
+            branch: student.branch || student.class,
             status: student.attendance[dateIndex]
           }))
         };
@@ -271,19 +271,19 @@ const TeacherAttendance = () => {
         filename = `Attendance_${selectedClass === 'all' ? 'All_Classes' : selectedClass}_${selectedDate.toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
         
         // CSV Header
-        csvContent = 'Student Name,Student ID,Class,Status,Date\n';
+        csvContent = 'Student Name,Student ID,Branch,Status,Date\n';
         
         // CSV Rows
         dateData.students.forEach(student => {
           const statusLabel = student.status === 'P' ? 'Present' : student.status === 'A' ? 'Absent' : 'Late';
-          csvContent += `"${student.name}","${student.id}","${student.class}","${statusLabel}","${selectedDate.toLocaleDateString('en-US')}"\n`;
+          csvContent += `"${student.name}","${student.id}","${student.branch || student.class}","${statusLabel}","${selectedDate.toLocaleDateString('en-US')}"\n`;
         });
       } else {
         // Export overview/summary data
         filename = `Attendance_Summary_${selectedClass === 'all' ? 'All_Classes' : selectedClass}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
         
         // CSV Header
-        csvContent = 'Student Name,Student ID,Class,Overall Attendance %,Status Today\n';
+        csvContent = 'Student Name,Student ID,Branch,Overall Attendance %,Status Today\n';
         
         // CSV Rows
         todaysAttendance.forEach(student => {
@@ -316,7 +316,7 @@ const TeacherAttendance = () => {
       {/* Header Section */}
       <div className="attendance-header">
         <div className="header-content">
-          <h1>📊 {selectedClass === 'all' ? 'All Classes' : `Class ${selectedClass}`} Attendance</h1>
+          <h1>📊 {selectedClass === 'all' ? 'All Branches' : `Branch ${selectedClass}`} Attendance</h1>
           <p>Track and manage student attendance with real-time insights and analytics</p>
         </div>
         <div className="header-actions">
@@ -349,7 +349,7 @@ const TeacherAttendance = () => {
           className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
         >
-          🏠 Class Overview
+          🏠 Branch Overview
         </button>
         <button 
           className={`tab-btn ${activeTab === 'trends' ? 'active' : ''}`}
@@ -414,7 +414,7 @@ const TeacherAttendance = () => {
                 {/* Class Sections */}
                 <div className="content-card">
                   <div className="card-header">
-                    <h3>🏫 Class Sections Summary</h3>
+                    <h3>🏫 Branch Sections Summary</h3>
                     <button 
                       className="view-all"
                       onClick={() => handleClassSectionClick('all')}
@@ -444,7 +444,7 @@ const TeacherAttendance = () => {
                 {/* Today's Attendance */}
                 <div className="content-card">
                   <div className="card-header">
-                    <h3>📅 Today's Attendance - {selectedClass === 'all' ? 'All Classes' : `Class ${selectedClass}`}</h3>
+                    <h3>📅 Today's Attendance - {selectedClass === 'all' ? 'All Branches' : `Branch ${selectedClass}`}</h3>
                     <span className="view-all">View All →</span>
                   </div>
                   <div className="attendance-list">
@@ -498,7 +498,7 @@ const TeacherAttendance = () => {
             </div>
 
             <div className="content-card">
-              <h3>📈 Monthly Overview - {selectedClass === 'all' ? 'All Classes' : `Class ${selectedClass}`}</h3>
+              <h3>📈 Monthly Overview - {selectedClass === 'all' ? 'All Branches' : `Branch ${selectedClass}`}</h3>
               <div className="monthly-list">
                 <div className="monthly-item">
                   <span>Current Month</span>
@@ -531,7 +531,7 @@ const TeacherAttendance = () => {
           ) : detailedAttendanceByDate && detailedAttendanceByDate.length > 0 && selectedDate ? (
             <div className="content-card">
               <div className="detailed-header">
-                <h3 style={{marginBottom: '20px', color: '#f0f4ff'}}>📋 Detailed Attendance Records - {selectedClass === 'all' ? 'All Classes' : selectedClass}</h3>
+                <h3 style={{marginBottom: '20px', color: '#f0f4ff'}}>📋 Detailed Attendance Records - {selectedClass === 'all' ? 'All Branches' : selectedClass}</h3>
                 
                 {/* Date Selector */}
                 <div className="date-selector">
@@ -568,7 +568,7 @@ const TeacherAttendance = () => {
                           <div className="student-details">
                             <div className="student-name-detail">{student.name}</div>
                             <div className="student-id-detail">ID: {student.id}</div>
-                            <div className="student-class-detail">Class: {student.class}</div>
+                            <div className="student-class-detail">Branch: {student.class}</div>
                           </div>
                         </div>
                         <div className={`attendance-status-badge ${statusClass}`}>

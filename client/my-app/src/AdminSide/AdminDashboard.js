@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
-import ReportAdmin from './ReportAdmin';
 import Students from './StudentAdmin';
 import Teachers from './TeacherAdmin';
 import FeeManagement from './FeeManagement';
@@ -149,13 +148,6 @@ function AdminDashboard({ onSignOut }) {
                 <div className="activity-desc">View and manage faculty records</div>
               </div>
             </div>
-            <div className="activity-item" onClick={() => setActiveSection('reports')} style={{cursor: 'pointer'}}>
-              <div className="activity-icon">📊</div>
-              <div className="activity-content">
-                <div className="activity-title">View Reports</div>
-                <div className="activity-desc">Generate and view analytical reports</div>
-              </div>
-            </div>
           </div>
         </section>
       </div>
@@ -183,13 +175,6 @@ function AdminDashboard({ onSignOut }) {
             aria-label="Dashboard"
           >
             <span role="img" aria-label="dashboard">📋</span> Dashboard
-          </button>
-          <button
-            className={activeSection === 'reports' ? 'active' : ''} 
-            onClick={() => setActiveSection('reports')} 
-            aria-label="Reports"
-          >
-            <span role="img" aria-label="reports">📄</span> Reports
           </button>
           <button 
             className={activeSection === 'students' ? 'active' : ''} 
@@ -240,9 +225,8 @@ function AdminDashboard({ onSignOut }) {
       </aside>
       
       <main className="parent-main">
-        {/* Render Dashboard, Reports, or Students without duplicate layouts */}
+        {/* Render Dashboard or Students without duplicate layouts */}
         {activeSection === 'dashboard' && renderDashboardContent()}
-        {activeSection === 'reports' && <ReportAdmin embedded={true} />}
         {activeSection === 'students' && <Students embedded={true} />}
         {activeSection === 'teachers' && <Teachers embedded={true} />}
         {activeSection === 'fee' && <FeeManagement embedded={true} />}

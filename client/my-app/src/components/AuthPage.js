@@ -61,10 +61,29 @@ const AuthPage = () => {
     setSuccess(null);
     
     try {
-      // Basic validation
-      if (!email || !password || !role) {
-        throw new Error('Please fill in all required fields');
+      // Basic validation with detailed error messages
+      console.log('🔍 Form submission - isLogin:', isLogin);
+      console.log('🔍 Email value:', email ? `"${email}"` : 'EMPTY');
+      console.log('🔍 Password value:', password ? 'SET (length: ' + password.length + ')' : 'EMPTY');
+      console.log('🔍 Role value:', role);
+      
+      if (!email || email.trim() === '') {
+        console.error('❌ Email is empty');
+        throw new Error('Please enter your email address');
       }
+      
+      if (!password || password.trim() === '') {
+        console.error('❌ Password is empty');
+        throw new Error('Please enter your password');
+      }
+      
+      // Sign Up specific validation
+      if (!isLogin && (!role || role.trim() === '')) {
+        console.error('❌ Validation failed: role missing for signup');
+        throw new Error('Please select your role');
+      }
+      
+      console.log('✅ Validation passed!');
 
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -141,16 +160,19 @@ const AuthPage = () => {
       
       console.log('🔍 Authentication Type:', isLogin ? 'Login' : 'Register');
       console.log('🔍 Endpoint:', endpoint);
-      console.log('🔍 Role:', role);
+      if (!isLogin) {
+        console.log('🔍 Role:', role);
+      }
       
-      // Prepare request body based on role and action
+      // Prepare request body based on action
       let requestBody = {
         email: email.trim(),
-        password,
-        role: role.toLowerCase()
+        password
       };
       
+      // Only include role for registration
       if (!isLogin) {
+        requestBody.role = role.toLowerCase();
         requestBody.name = name.trim();
         requestBody.phone = phone;
         
@@ -234,7 +256,7 @@ const AuthPage = () => {
     {
       id: 'teacher',
       title: 'Teacher',
-      description: 'Manage classes and student progress',
+      description: 'Manage branches and student progress',
       icon: '‍🏫'
     },
     {
@@ -407,23 +429,25 @@ const AuthPage = () => {
             </>
           )}
 
-          {/* Role Selection - Show for both Sign In and Sign Up */}
-          <div className="form-group">
-            <label htmlFor="role">Select Your Role</label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="form-select"
-              required
-            >
-              {roles.map((roleOption) => (
-                <option key={roleOption.id} value={roleOption.id}>
-                  {roleOption.icon} {roleOption.title}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Role Selection - Show only for Sign Up */}
+          {!isLogin && (
+            <div className="form-group">
+              <label htmlFor="role">Select Your Role</label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="form-select"
+                required
+              >
+                {roles.map((roleOption) => (
+                  <option key={roleOption.id} value={roleOption.id}>
+                    {roleOption.icon} {roleOption.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Sign Up Only: Phone Number (for all roles) */}
           {!isLogin && (

@@ -38,9 +38,10 @@ exports.uploadStudents = async (req, res) => {
           studentName: record['Student Name'] || record['studentName'] || record['STUDENT NAME'] || '',
           rollNo: record['Roll No'] || record['rollNo'] || record['Roll Number'] || record['ROLL NO'] || '',
           email: record['Email'] || record['email'] || record['EMAIL'] || '',
-          class: record['Class'] || record['class'] || record['CLASS'] || '',
+          branch: record['Branch'] || record['branch'] || record['BRANCH'] || record['Class'] || record['class'] || record['CLASS'] || '',
           year: record['Year'] || record['year'] || record['YEAR'] || '',
           batch: record['Batch'] || record['batch'] || record['BATCH'] || '',
+          semester: record['Semester'] || record['semester'] || record['SEMESTER'] || '',
           attendance: parseFloat(record['Attendance'] || record['attendance'] || record['ATTENDANCE']) || 0,
           gpa: parseFloat(record['GPA'] || record['gpa'] || record['Gpa']) || 0,
           status: record['Status'] || record['status'] || record['STATUS'] || 'Active',
@@ -249,10 +250,10 @@ exports.uploadTeachers = async (req, res) => {
 // Get all students
 exports.getAllStudents = async (req, res) => {
   try {
-    const { page = 1, limit = 50, class: className, batch, status } = req.query;
+    const { page = 1, limit = 1000, branch, batch, status } = req.query;
     
     const query = {};
-    if (className) query.class = className;
+    if (branch) query.branch = branch;
     if (batch) query.batch = batch;
     if (status) query.status = status;
 
@@ -280,7 +281,7 @@ exports.getAllStudents = async (req, res) => {
 // Get all teachers
 exports.getAllTeachers = async (req, res) => {
   try {
-    const { page = 1, limit = 50, department, status } = req.query;
+    const { page = 1, limit = 1000, department, status } = req.query;
     
     const query = {};
     if (department) query.department = department;
@@ -353,9 +354,9 @@ exports.getStats = async (req, res) => {
     const activeStudents = await AdminStudent.countDocuments({ status: 'Active' });
     const activeTeachers = await AdminTeacher.countDocuments({ status: 'Active' });
 
-    // Get students by class
-    const studentsByClass = await AdminStudent.aggregate([
-      { $group: { _id: '$class', count: { $sum: 1 } } },
+    // Get students by branch
+    const studentsByBranch = await AdminStudent.aggregate([
+      { $group: { _id: '$branch', count: { $sum: 1 } } },
       { $sort: { _id: 1 } }
     ]);
 
@@ -370,7 +371,7 @@ exports.getStats = async (req, res) => {
       totalTeachers,
       activeStudents,
       activeTeachers,
-      studentsByClass,
+      studentsByBranch,
       teachersByDept
     });
 
@@ -380,13 +381,13 @@ exports.getStats = async (req, res) => {
   }
 };
 
-// Assign classes and subjects to a teacher
+// Assign branches and subjects to a teacher
 exports.assignToTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-    const { classes, subjects, semester } = req.body;
+    const { branches, subjects, semester } = req.body;
 
-    console.log(`📝 Assigning to teacher ${id}:`, { classes, subjects, semester });
+    console.log(`📝 Assigning to teacher ${id}:`, { branches, subjects, semester });
 
     // Find and update the teacher
     const teacher = await AdminTeacher.findById(id);
@@ -395,8 +396,8 @@ exports.assignToTeacher = async (req, res) => {
       return res.status(404).json({ message: 'Teacher not found' });
     }
 
-    // Update teacher's assigned classes, subjects, and semester
-    teacher.assignedClasses = classes || [];
+    // Update teacher's assigned branches, subjects, and semester
+    teacher.assignedBranches = branches || [];
     teacher.assignedSubjects = subjects || [];
     if (semester) teacher.semester = semester;
     teacher.lastAssignedAt = new Date();
@@ -407,13 +408,13 @@ exports.assignToTeacher = async (req, res) => {
     console.log(`✅ Successfully assigned to teacher: ${teacher.teacherName}`);
 
     res.status(200).json({
-      message: 'Successfully assigned classes and subjects to teacher',
+      message: 'Successfully assigned branches and subjects to teacher',
       teacher: {
         _id: teacher._id,
         teacherName: teacher.teacherName,
         employeeId: teacher.employeeId,
         email: teacher.email,
-        assignedClasses: teacher.assignedClasses,
+        assignedBranches: teacher.assignedBranches,
         assignedSubjects: teacher.assignedSubjects,
         semester: teacher.semester
       }
@@ -425,23 +426,23 @@ exports.assignToTeacher = async (req, res) => {
   }
 };
 
-// Get all available classes
-exports.getAvailableClasses = async (req, res) => {
+// Get all available branches
+exports.getAvailableBranches = async (req, res) => {
   try {
-    // Get unique classes from students
-    const classes = await AdminStudent.distinct('class');
+    // Get unique branches from students
+    const branches = await AdminStudent.distinct('branch');
     
     // Filter out empty values and sort
-    const filteredClasses = classes
+    const filteredBranches = branches
       .filter(c => c && c.trim() !== '')
       .sort();
 
     res.status(200).json({
-      classes: filteredClasses
+      branches: filteredBranches
     });
 
   } catch (error) {
-    console.error('❌ Get available classes error:', error);
+    console.error('❌ Get available branches error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -473,5 +474,146 @@ exports.getAvailableSubjects = async (req, res) => {
   } catch (error) {
     console.error('❌ Get available subjects error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Clear all students from database
+exports.clearAllStudents = async (req, res) => {
+  try {
+    console.log('🗑️ Clearing all students from database...');
+    console.log('👤 Requested by:', req.user?.email, 'Role:', req.user?.role);
+    
+    const result = await AdminStudent.deleteMany({});
+    
+    console.log(`✅ Deleted ${result.deletedCount} students`);
+    
+    res.status(200).json({
+      message: 'All students cleared successfully',
+      deletedCount: result.deletedCount
+    });
+
+  } catch (error) {
+    console.error('❌ Clear students error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Update student
+exports.updateStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+    
+    // Don't allow these fields to be updated
+    delete updateData.password;
+    delete updateData._id;
+    delete updateData.id;
+    delete updateData.uploadedBy;
+    delete updateData.createdAt;
+    delete updateData.updatedAt;
+    
+    console.log('📝 Updating student:', id);
+    console.log('📦 Update data:', updateData);
+
+    const student = await AdminStudent.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password');
+    
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    console.log('✅ Student updated successfully:', student._id);
+
+    res.status(200).json({
+      message: 'Student updated successfully',
+      student
+    });
+
+  } catch (error) {
+    console.error('❌ Update student error:', error);
+    
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({ 
+        message: `A student with this ${field} already exists` 
+      });
+    }
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({ 
+        message: messages.join(', ') 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Failed to update student', 
+      error: error.message 
+    });
+  }
+};
+
+// Update teacher
+exports.updateTeacher = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+    
+    // Don't allow these fields to be updated
+    delete updateData.password;
+    delete updateData._id;
+    delete updateData.id;
+    delete updateData.uploadedBy;
+    delete updateData.createdAt;
+    delete updateData.updatedAt;
+    
+    console.log('📝 Updating teacher:', id);
+    console.log('📦 Update data:', updateData);
+
+    const teacher = await AdminTeacher.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password');
+    
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    console.log('✅ Teacher updated successfully:', teacher._id);
+
+    res.status(200).json({
+      message: 'Teacher updated successfully',
+      teacher
+    });
+
+  } catch (error) {
+    console.error('❌ Update teacher error:', error);
+    
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({ 
+        message: `A teacher with this ${field} already exists` 
+      });
+    }
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({ 
+        message: messages.join(', ') 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Failed to update teacher', 
+      error: error.message 
+    });
   }
 };

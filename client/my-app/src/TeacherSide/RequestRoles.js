@@ -156,7 +156,7 @@ const RequestRoles = () => {
 
   return (
     <div className="request-roles-container">
-      <h2>📋 Request Class & Subject Assignment</h2>
+      <h2>📋 Request Branch & Subject Assignment</h2>
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
@@ -166,7 +166,7 @@ const RequestRoles = () => {
           <form onSubmit={handleSubmit} className="request-form">
             <div className="info-note">
               <span className="info-icon">ℹ️</span>
-              <p>Classes will be assigned by the admin upon approval of your request.</p>
+              <p>Branches will be assigned by the admin upon approval of your request.</p>
             </div>
 
             <div className="form-group">

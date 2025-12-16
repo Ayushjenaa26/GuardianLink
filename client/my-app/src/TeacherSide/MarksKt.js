@@ -213,7 +213,7 @@ const MarksKT = () => {
         filename = `Performance_Summary_${activeSubject.replace(/ /g, '_')}_${new Date().toLocaleDateString('en-US').replace(/\//g, '-')}.csv`;
         
         csvContent = 'Metric,Value\n';
-        csvContent += `"Class Average","${currentTrends.averageScore}%"\n`;
+        csvContent += `"Branch Average","${currentTrends.averageScore}%"\n`;
         csvContent += `"Top Performer","${currentTrends.topPerformer}"\n`;
         csvContent += `"KT Students","${currentTrends.ktStudents}"\n`;
         csvContent += `"Assignment Completion","${currentTrends.assignmentCompletion}%"\n`;
@@ -319,7 +319,7 @@ const MarksKT = () => {
           <div className="metrics-grid">
             <div className="metric-card primary">
               <div className="metric-value">{currentTrends.averageScore}%</div>
-              <div className="metric-label">Class Average</div>
+              <div className="metric-label">Branch Average</div>
               <div className="metric-trend positive">+2.1% from last month</div>
             </div>
             <div className="metric-card">

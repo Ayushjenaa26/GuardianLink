@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const Teacher = require('../models/TeacherSide/Teacher');
-const Student = require('../models/Student');
+const AdminTeacher = require('../models/AdminSide/AdminTeacher');
+const AdminStudent = require('../models/AdminSide/AdminStudent');
 const Admin = require('../models/Admin');
 
 module.exports = async (req, res, next) => {
@@ -26,10 +26,10 @@ module.exports = async (req, res, next) => {
         let user;
         switch (payload.role) {
             case 'teacher':
-                user = await Teacher.findById(payload.id);
+                user = await AdminTeacher.findById(payload.id);
                 break;
             case 'student':
-                user = await Student.findById(payload.id);
+                user = await AdminStudent.findById(payload.id);
                 break;
             case 'admin':
                 user = await Admin.findById(payload.id);
@@ -46,7 +46,7 @@ module.exports = async (req, res, next) => {
         req.user = {
             id: user._id,
             role: payload.role,
-            name: user.name,
+            name: user.name || user.studentName || user.teacherName,
             email: user.email
         };
 

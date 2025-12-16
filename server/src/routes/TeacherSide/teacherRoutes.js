@@ -5,7 +5,7 @@ const studentController = require('../../controllers/TeacherSide/StudentControll
 const dashboardController = require('../../controllers/TeacherSide/dashboardController');
 const roleRequestController = require('../../controllers/AdminSide/roleRequestController');
 const { check } = require('express-validator');
-const Student = require('../../models/Student');
+const AdminStudent = require('../../models/AdminSide/AdminStudent');
 
 // Dashboard Route
 router.get('/dashboard', authMiddleware, dashboardController.getDashboardData);
@@ -17,7 +17,7 @@ router.post('/students', [
         check('name', 'Name is required').notEmpty(),
         check('email', 'Please include a valid email').isEmail(),
         check('password', 'Password must be at least 6 characters long').isLength({ min: 6 }),
-        check('class', 'Class is required').notEmpty(),
+        check('branch', 'Branch is required').notEmpty(),
         check('section', 'Section is required').notEmpty(),
         check('admissionNumber', 'Admission number is required').notEmpty(),
         check('parentName', 'Parent name is required').notEmpty(),
@@ -26,7 +26,7 @@ router.post('/students', [
 ], studentController.createStudent);
 router.get('/students', authMiddleware, async (req, res) => {
     try {
-        const students = await Student.find({}).sort({ createdAt: -1 }).limit(req.query.limit ? parseInt(req.query.limit) : 10);
+        const students = await AdminStudent.find({}).sort({ createdAt: -1 }).limit(req.query.limit ? parseInt(req.query.limit) : 10);
         res.json(students);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -34,7 +34,7 @@ router.get('/students', authMiddleware, async (req, res) => {
 });
 router.get('/students/:id', authMiddleware, async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id);
+        const student = await AdminStudent.findById(req.params.id);
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -45,7 +45,7 @@ router.get('/students/:id', authMiddleware, async (req, res) => {
 });
 router.put('/students/:id', authMiddleware, async (req, res) => {
     try {
-        const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const student = await AdminStudent.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -76,7 +76,7 @@ router.post('/attendance', [
   [
     check('studentId', 'Student ID is required').not().isEmpty(),
     check('status', 'Status must be present, absent, or late').isIn(['present', 'absent', 'late']),
-    check('class', 'Class is required').not().isEmpty()
+    check('branch', 'Branch is required').not().isEmpty()
   ]
 ], attendanceController.markAttendance);
 
@@ -116,7 +116,7 @@ router.post('/marks', [
 router.get('/marks/student/:studentId', authMiddleware, marksController.getStudentMarks);
 router.put('/marks/:marksId', authMiddleware, marksController.updateMarks);
 router.delete('/marks/:marksId', authMiddleware, marksController.deleteMarks);
-router.get('/marks/stats', authMiddleware, marksController.getClassStats);
+router.get('/marks/stats', authMiddleware, marksController.getBranchStats);
 
 // Role request routes (teacher side)
 router.post('/role-request', authMiddleware, roleRequestController.createRoleRequest);

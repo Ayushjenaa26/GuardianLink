@@ -1,4 +1,5 @@
-const Student = require('../../models/TeacherSide/Student');
+const AdminStudent = require('../../models/AdminSide/AdminStudent');
+const AdminTeacher = require('../../models/AdminSide/AdminTeacher');
 const BehaviorReport = require('../../models/TeacherSide/BehaviorReport');
 const Attendance = require('../../models/TeacherSide/Attendance');
 
@@ -6,13 +7,16 @@ exports.getDashboardData = async (req, res) => {
     try {
         // Get teacher ID from auth middleware
         const teacherId = req.user.id;
+        
+        // Get teacher details to find branches
+        const teacher = await AdminTeacher.findById(teacherId);
+        const teacherBranches = teacher ? (Array.isArray(teacher.branches) ? teacher.branches : teacher.branches.split(',')) : [];
 
-        // Get total students count
-        const totalStudents = await Student.countDocuments({ teacherId });
+        // Get total students count (students in teacher's branches)
+        const totalStudents = await AdminStudent.countDocuments({ branch: { $in: teacherBranches } });
 
-        // Get unique classes/batches count
-        const uniqueClasses = await Student.distinct('batch', { teacherId });
-        const totalClasses = uniqueClasses.length;
+        // Get unique branches count
+        const totalBranches = teacherBranches.length;
 
         // Calculate average attendance
         const attendanceData = await Attendance.aggregate([
@@ -32,12 +36,12 @@ exports.getDashboardData = async (req, res) => {
 
         // Get next scheduled class (you'll need to implement your schedule model)
         // For now returning placeholder data
-        const nextClass = uniqueClasses[0] || 'No classes scheduled';
+        const nextClass = teacherBranches[0] || 'No sessions scheduled';
         const nextClassTime = '10:00 AM';
 
         res.json({
             totalStudents,
-            totalClasses,
+            totalBranches,
             pendingReviews,
             averageAttendance,
             nextClass,

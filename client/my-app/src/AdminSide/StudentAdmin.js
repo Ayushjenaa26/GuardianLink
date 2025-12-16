@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './AdminDashboard.css';
+import './StudentAdmin.css';
 import { API_URL } from '../config';
 
 function Students({ embedded = false }) {
@@ -7,9 +8,11 @@ function Students({ embedded = false }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingStudent, setEditingStudent] = useState(null);
   const [filters, setFilters] = useState({
     batch: '',
-    class: '',
+    branch: '',
     year: '',
     search: ''
   });
@@ -61,9 +64,10 @@ function Students({ embedded = false }) {
         id: student._id,
         name: student.studentName,
         rollNo: student.rollNo,
-        class: student.class,
+        branch: student.branch || student.class,
         year: student.year,
         batch: student.batch,
+        semester: student.semester || '',
         email: student.email,
         phone: student.phone || '',
         attendance: student.attendance || 0,
@@ -90,7 +94,7 @@ function Students({ embedded = false }) {
   const filteredStudents = students.filter(student => {
     return (
       (filters.batch === '' || student.batch === filters.batch) &&
-      (filters.class === '' || student.class === filters.class) &&
+      (filters.branch === '' || student.branch === filters.branch) &&
       (filters.year === '' || student.year === filters.year) &&
       (filters.search === '' || 
         student.name.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -101,7 +105,7 @@ function Students({ embedded = false }) {
 
   // Get unique values for filters
   const batches = [...new Set(students.map(student => student.batch))];
-  const classes = [...new Set(students.map(student => student.class))];
+  const branches = [...new Set(students.map(student => student.branch))];
   const years = [...new Set(students.map(student => student.year))];
 
   const handleFilterChange = (filterType, value) => {
@@ -114,11 +118,116 @@ function Students({ embedded = false }) {
   const handleAddStudent = () => {
     // Add student functionality
     console.log('Add new student');
+    alert('Add student feature - Coming soon!');
+  };
+
+  const handleClearAllStudents = async () => {
+    if (!window.confirm('⚠️ WARNING: This will permanently delete ALL students from the database. This action cannot be undone. Are you absolutely sure?')) {
+      return;
+    }
+    
+    if (!window.confirm('This is your final confirmation. Type "DELETE" to proceed.') || 
+        prompt('Type "DELETE" to confirm:') !== 'DELETE') {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/admin/students`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`✅ Successfully cleared ${data.deletedCount} students from database`);
+        fetchStudents();
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Failed to clear students');
+      }
+    } catch (err) {
+      console.error('Clear error:', err);
+      alert('Failed to clear students. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEditStudent = (student) => {
-    // Edit student functionality
-    console.log('Edit student:', student);
+    setEditingStudent({
+      id: student.id,
+      studentName: student.name,
+      rollNo: student.rollNo,
+      email: student.email,
+      branch: student.branch,
+      year: student.year,
+      batch: student.batch,
+      semester: student.semester,
+      phone: student.phone,
+      attendance: student.attendance,
+      gpa: student.gpa,
+      status: student.status
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingStudent) return;
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      // Create update data without id field
+      const updateData = {
+        studentName: editingStudent.studentName,
+        rollNo: editingStudent.rollNo,
+        email: editingStudent.email,
+        phone: editingStudent.phone,
+        branch: editingStudent.branch,
+        year: editingStudent.year,
+        batch: editingStudent.batch,
+        semester: editingStudent.semester,
+        attendance: editingStudent.attendance,
+        gpa: editingStudent.gpa,
+        status: editingStudent.status
+      };
+      
+      const response = await fetch(`${API_URL}/api/admin/students/${editingStudent.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('✅ ' + data.message);
+        setShowEditModal(false);
+        setEditingStudent(null);
+        fetchStudents();
+      } else {
+        alert('❌ ' + (data.message || 'Failed to update student'));
+      }
+    } catch (err) {
+      console.error('Update error:', err);
+      alert('❌ Failed to update student. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingStudent(null);
   };
 
   const handleDeleteStudent = async (student) => {
@@ -173,6 +282,7 @@ function Students({ embedded = false }) {
         </div>
         <div className="parent-actions">
           <button className="export-btn" onClick={handleAddStudent}>➕ Add Student</button>
+          <button className="clear-all-btn" onClick={handleClearAllStudents} style={{marginLeft: '10px', background: '#ef4444'}}>🗑️ Clear All</button>
         </div>
       </header>
 
@@ -184,12 +294,6 @@ function Students({ embedded = false }) {
             onClick={() => setActiveTab('overview')}
           >
             Overview
-          </button>
-          <button 
-            className={`tab ${activeTab === 'details' ? 'active' : ''}`}
-            onClick={() => setActiveTab('details')}
-          >
-            Student Details
           </button>
           <button 
             className={`tab ${activeTab === 'attendance' ? 'active' : ''}`}
@@ -230,14 +334,14 @@ function Students({ embedded = false }) {
           </select>
         </div>
         <div className="filter-group">
-          <label>Class</label>
+          <label>Branch</label>
           <select 
-            value={filters.class} 
-            onChange={(e) => handleFilterChange('class', e.target.value)}
+            value={filters.branch} 
+            onChange={(e) => handleFilterChange('branch', e.target.value)}
           >
-            <option value="">All Classes</option>
-            {classes.map(cls => (
-              <option key={cls} value={cls}>{cls}</option>
+            <option value="">All Branches</option>
+            {branches.map(branch => (
+              <option key={branch} value={branch}>{branch}</option>
             ))}
           </select>
         </div>
@@ -299,9 +403,10 @@ function Students({ embedded = false }) {
                 <th>Student Name</th>
                 <th>Roll No</th>
                 <th>Email</th>
-                <th>Class</th>
+                <th>Branch</th>
                 <th>Year</th>
                 <th>Batch</th>
+                <th>Semester</th>
                 <th>Attendance</th>
                 <th>GPA</th>
                 <th>Status</th>
@@ -321,9 +426,10 @@ function Students({ embedded = false }) {
                   </td>
                   <td>{student.rollNo}</td>
                   <td>{student.email}</td>
-                  <td>{student.class}</td>
+                  <td>{student.branch}</td>
                   <td>{student.year}</td>
                   <td>{student.batch}</td>
+                  <td>{student.semester}</td>
                   <td>
                     <div className="attendance-display">
                       <span className={`attendance-value ${student.attendance < 75 ? 'low' : student.attendance < 85 ? 'medium' : 'high'}`}>
@@ -372,6 +478,136 @@ function Students({ embedded = false }) {
           )}
         </div>
       </section>
+
+      {/* Edit Student Modal */}
+      {showEditModal && editingStudent && (
+        <div className="modal-overlay" onClick={handleCloseEditModal}>
+          <div className="edit-student-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ Edit Student - {editingStudent.studentName}</h3>
+              <button className="close-btn" onClick={handleCloseEditModal}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Student Name <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    value={editingStudent.studentName}
+                    onChange={(e) => setEditingStudent({...editingStudent, studentName: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Roll No <span className="required">*</span></label>
+                  <input
+                    type="text"
+                    value={editingStudent.rollNo}
+                    onChange={(e) => setEditingStudent({...editingStudent, rollNo: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Email <span className="required">*</span></label>
+                  <input
+                    type="email"
+                    value={editingStudent.email}
+                    onChange={(e) => setEditingStudent({...editingStudent, email: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Phone</label>
+                  <input
+                    type="text"
+                    value={editingStudent.phone}
+                    onChange={(e) => setEditingStudent({...editingStudent, phone: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Branch</label>
+                  <input
+                    type="text"
+                    value={editingStudent.branch}
+                    onChange={(e) => setEditingStudent({...editingStudent, branch: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Year</label>
+                  <input
+                    type="text"
+                    value={editingStudent.year}
+                    onChange={(e) => setEditingStudent({...editingStudent, year: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Batch</label>
+                  <input
+                    type="text"
+                    value={editingStudent.batch}
+                    onChange={(e) => setEditingStudent({...editingStudent, batch: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Semester</label>
+                  <input
+                    type="text"
+                    value={editingStudent.semester}
+                    onChange={(e) => setEditingStudent({...editingStudent, semester: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Attendance (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={editingStudent.attendance}
+                    onChange={(e) => setEditingStudent({...editingStudent, attendance: parseFloat(e.target.value)})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>GPA</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={editingStudent.gpa}
+                    onChange={(e) => setEditingStudent({...editingStudent, gpa: parseFloat(e.target.value)})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Status</label>
+                  <select
+                    value={editingStudent.status}
+                    onChange={(e) => setEditingStudent({...editingStudent, status: e.target.value})}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="cancel-btn" onClick={handleCloseEditModal}>
+                Cancel
+              </button>
+              <button className="save-btn" onClick={handleSaveEdit}>
+                💾 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 

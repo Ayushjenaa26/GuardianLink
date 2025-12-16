@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Teacher = require('../../models/TeacherSide/Teacher');
+const AdminTeacher = require('../../models/AdminSide/AdminTeacher');
 
 const teacherAuth = async (req, res, next) => {
   try {
@@ -23,9 +23,9 @@ const teacherAuth = async (req, res, next) => {
     console.log('✅ Token decoded:', decoded);
 
     // Find teacher
-    const teacher = await Teacher.findOne({
+    const teacher = await AdminTeacher.findOne({
       _id: decoded.id,
-      isActive: true
+      status: 'Active'
     });
 
     if (!teacher) {

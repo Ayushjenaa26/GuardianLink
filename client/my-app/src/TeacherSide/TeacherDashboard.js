@@ -15,7 +15,7 @@ function TeacherDashboard() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [dashboardData, setDashboardData] = useState({
     totalStudents: 0,
-    totalClasses: 0,
+    totalBranches: 0,
     pendingReviews: 0,
     averageAttendance: 0,
     nextClass: '',
@@ -90,7 +90,7 @@ function TeacherDashboard() {
             <header className="parent-header">
               <div>
                 <h2>🎯 Teacher Dashboard</h2>
-                <span className="parent-welcome">Welcome back, {teacherInfo.name}! Manage your classes and track student progress</span>
+                <span className="parent-welcome">Welcome back, {teacherInfo.name}! Manage your branches and track student progress</span>
               </div>
             </header>
             
@@ -102,13 +102,13 @@ function TeacherDashboard() {
               ) : (
                 <>
                   <div className="parent-card card-blue">
-                    <div>📚 My Classes</div>
-                    <div className="parent-card-value">{dashboardData.totalClasses}</div>
+                    <div>📚 My Branches</div>
+                    <div className="parent-card-value">{dashboardData.totalBranches}</div>
                     <div className="parent-card-desc">Total students: {dashboardData.totalStudents} across all sections</div>
                   </div>
                   <div className="parent-card card-yellow">
                     <div>🕒 Today's Schedule</div>
-                    <div className="parent-card-value">{dashboardData.totalClasses}</div>
+                    <div className="parent-card-value">{dashboardData.totalBranches}</div>
                     <div className="parent-card-desc">Next: {dashboardData.nextClass} at {dashboardData.nextClassTime}</div>
                   </div>
                   <div className="parent-card card-red">

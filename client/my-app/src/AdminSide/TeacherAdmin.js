@@ -1,6 +1,7 @@
 // Teachers.js (Admin Dashboard)
 import React, { useState, useEffect, useCallback } from 'react';
 import './TeacherAdmin.css';
+import './TeacherAdminModals.css';
 import { API_URL } from '../config';
 
 function Teachers({ embedded = false }) {
@@ -14,6 +15,10 @@ function Teachers({ embedded = false }) {
     status: '',
     search: ''
   });
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [editingTeacher, setEditingTeacher] = useState(null);
 
   // Fetch teachers from database
   const fetchTeachers = useCallback(async () => {
@@ -43,10 +48,13 @@ function Teachers({ embedded = false }) {
       }
 
       if (!response.ok) {
-        throw new Error('Failed to fetch teachers');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Fetch teachers failed:', response.status, errorData);
+        throw new Error(errorData.message || 'Failed to fetch teachers');
       }
 
       const data = await response.json();
+      console.log('✅ Teachers fetched:', data);
       
       // Map database fields to component fields
       const mappedTeachers = (data.teachers || []).map(teacher => ({
@@ -60,8 +68,8 @@ function Teachers({ embedded = false }) {
         subjects: teacher.subject ? [teacher.subject] : [],
         experience: teacher.experience || '0 years',
         qualification: teacher.qualification || '',
-        classes: teacher.classes ? (Array.isArray(teacher.classes) ? teacher.classes.length : teacher.classes.split(',').length) : 0,
-        students: 0, // Calculate based on classes if needed
+        branches: teacher.branches ? (Array.isArray(teacher.branches) ? teacher.branches.length : teacher.branches.split(',').length) : 0,
+        students: 0, // Calculate based on branches if needed
         joinDate: teacher.createdAt,
         status: teacher.status || 'Active',
         attendance: teacher.attendance || 95
@@ -112,8 +120,50 @@ function Teachers({ embedded = false }) {
   };
 
   const handleEditTeacher = (teacher) => {
-    // Edit teacher functionality
-    console.log('Edit teacher:', teacher);
+    setEditingTeacher({...teacher});
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingTeacher) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const updateData = {
+        teacherName: editingTeacher.name,
+        employeeId: editingTeacher.employeeId,
+        email: editingTeacher.email,
+        phone: editingTeacher.phone,
+        department: editingTeacher.department,
+        designation: editingTeacher.designation,
+        subject: editingTeacher.subjects[0] || '',
+        experience: editingTeacher.experience,
+        qualification: editingTeacher.qualification,
+        status: editingTeacher.status
+      };
+
+      const response = await fetch(`${API_URL}/api/admin/teachers/${editingTeacher.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (response.ok) {
+        alert('✅ Teacher updated successfully!');
+        setShowEditModal(false);
+        setEditingTeacher(null);
+        fetchTeachers();
+      } else {
+        const data = await response.json();
+        alert(`❌ ${data.message || 'Failed to update teacher'}`);
+      }
+    } catch (err) {
+      console.error('Update error:', err);
+      alert('❌ Failed to update teacher. Please try again.');
+    }
   };
 
   const handleDeleteTeacher = async (teacher) => {
@@ -144,8 +194,8 @@ function Teachers({ embedded = false }) {
   };
 
   const handleViewDetails = (teacher) => {
-    // View teacher details functionality
-    console.log('View teacher details:', teacher);
+    setSelectedTeacher(teacher);
+    setShowViewModal(true);
   };
 
   if (loading) return <div className="loading">Loading teachers...</div>;
@@ -184,18 +234,6 @@ function Teachers({ embedded = false }) {
             onClick={() => setActiveTab('overview')}
           >
             Overview
-          </button>
-          <button 
-            className={`tab ${activeTab === 'details' ? 'active' : ''}`}
-            onClick={() => setActiveTab('details')}
-          >
-            Teacher Details
-          </button>
-          <button 
-            className={`tab ${activeTab === 'schedule' ? 'active' : ''}`}
-            onClick={() => setActiveTab('schedule')}
-          >
-            Teaching Schedule
           </button>
           <button 
             className={`tab ${activeTab === 'performance' ? 'active' : ''}`}
@@ -306,9 +344,9 @@ function Teachers({ embedded = false }) {
                 <th>Email</th>
                 <th>Department</th>
                 <th>Designation</th>
-                <th>Subjects</th>
+                <th>Specialized Subject</th>
                 <th>Experience</th>
-                <th>Classes</th>
+                <th>Branches</th>
                 <th>Attendance</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -341,7 +379,7 @@ function Teachers({ embedded = false }) {
                   </td>
                   <td>{teacher.experience}</td>
                   <td>
-                    <span className="classes-count">{teacher.classes} classes</span>
+                    <span className="classes-count">{teacher.branches} branches</span>
                   </td>
                   <td>
                     <div className="attendance-display">
@@ -426,7 +464,190 @@ function Teachers({ embedded = false }) {
 
   // If embedded, just return the content without the layout wrapper
   if (embedded) {
-    return <div className="teachers-embedded">{teachersContent}</div>;
+    return (
+      <div className="teachers-embedded">
+        {teachersContent}
+        
+        {/* View Teacher Modal */}
+        {showViewModal && selectedTeacher && (
+          <div className="modal-overlay" onClick={() => setShowViewModal(false)}>
+            <div className="view-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>👁️ Teacher Details</h2>
+                <button className="close-btn" onClick={() => setShowViewModal(false)}>✕</button>
+              </div>
+              <div className="modal-body">
+                <div className="teacher-info-grid">
+                  <div className="info-item">
+                    <label>Teacher Name</label>
+                    <p>{selectedTeacher.name}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Employee ID</label>
+                    <p>{selectedTeacher.employeeId}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Email</label>
+                    <p>{selectedTeacher.email}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Phone</label>
+                    <p>{selectedTeacher.phone || 'N/A'}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Department</label>
+                    <p>{selectedTeacher.department}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Designation</label>
+                    <p>{selectedTeacher.designation}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Specialized Subject</label>
+                    <p>{selectedTeacher.subjects.join(', ') || 'N/A'}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Experience</label>
+                    <p>{selectedTeacher.experience}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Qualification</label>
+                    <p>{selectedTeacher.qualification || 'N/A'}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Branches</label>
+                    <p>{selectedTeacher.branches} branches</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Attendance</label>
+                    <p>{selectedTeacher.attendance}%</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Status</label>
+                    <p>
+                      <span className={`status-badge ${selectedTeacher.status === 'Active' ? 'active' : 'inactive'}`}>
+                        {selectedTeacher.status}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="cancel-btn" onClick={() => setShowViewModal(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Teacher Modal */}
+        {showEditModal && editingTeacher && (
+          <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+            <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>✏️ Edit Teacher</h2>
+                <button className="close-btn" onClick={() => setShowEditModal(false)}>✕</button>
+              </div>
+              <div className="modal-body">
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Teacher Name <span className="required">*</span></label>
+                    <input
+                      type="text"
+                      value={editingTeacher.name}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Employee ID <span className="required">*</span></label>
+                    <input
+                      type="text"
+                      value={editingTeacher.employeeId}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, employeeId: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email <span className="required">*</span></label>
+                    <input
+                      type="email"
+                      value={editingTeacher.email}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, email: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone</label>
+                    <input
+                      type="tel"
+                      value={editingTeacher.phone}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, phone: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Department <span className="required">*</span></label>
+                    <input
+                      type="text"
+                      value={editingTeacher.department}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, department: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Designation</label>
+                    <input
+                      type="text"
+                      value={editingTeacher.designation}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, designation: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Specialized Subject</label>
+                    <input
+                      type="text"
+                      value={editingTeacher.subjects[0] || ''}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, subjects: [e.target.value]})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Experience</label>
+                    <input
+                      type="text"
+                      value={editingTeacher.experience}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, experience: e.target.value})}
+                      placeholder="e.g., 5 years"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Qualification</label>
+                    <input
+                      type="text"
+                      value={editingTeacher.qualification || ''}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, qualification: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      value={editingTeacher.status}
+                      onChange={(e) => setEditingTeacher({...editingTeacher, status: e.target.value})}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="On Leave">On Leave</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="cancel-btn" onClick={() => setShowEditModal(false)}>Cancel</button>
+                <button className="save-btn" onClick={handleSaveEdit}>Save Changes</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   }
 
   // If not embedded, return the full layout with sidebar

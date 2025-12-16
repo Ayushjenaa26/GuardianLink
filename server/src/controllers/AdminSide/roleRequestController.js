@@ -129,7 +129,7 @@ exports.createRoleRequest = async (req, res) => {
       teacherEmail: teacher.email,
       employeeId: teacher.employeeId,
       department,
-      requestedClasses: [],
+      requestedBranches: [],
       requestedSubjects,
       requestMessage: requestMessage || ''
     });
@@ -156,12 +156,12 @@ exports.approveRoleRequest = async (req, res) => {
     console.log('📥 Approve role request:', req.params.id);
     console.log('👤 Admin:', req.user?.email, 'ID:', req.user?.id);
 
-    const { adminResponse, classes, semester } = req.body;
+    const { adminResponse, branches, semester } = req.body;
 
-    // Validate classes
-    if (!classes || !Array.isArray(classes) || classes.length === 0) {
+    // Validate branches
+    if (!branches || !Array.isArray(branches) || branches.length === 0) {
       return res.status(400).json({ 
-        message: 'Please select at least one class to assign' 
+        message: 'Please select at least one branch to assign' 
       });
     }
 
@@ -189,9 +189,9 @@ exports.approveRoleRequest = async (req, res) => {
     }
 
     // Merge with existing assignments (avoid duplicates)
-    const updatedClasses = [...new Set([
-      ...(teacher.assignedClasses || []),
-      ...classes
+    const updatedBranches = [...new Set([
+      ...(teacher.assignedBranches || []),
+      ...branches
     ])];
 
     const updatedSubjects = [...new Set([
@@ -199,7 +199,7 @@ exports.approveRoleRequest = async (req, res) => {
       ...roleRequest.requestedSubjects
     ])];
 
-    teacher.assignedClasses = updatedClasses;
+    teacher.assignedBranches = updatedBranches;
     teacher.assignedSubjects = updatedSubjects;
     if (semester) teacher.semester = semester;
     teacher.lastAssignedAt = new Date();
@@ -207,8 +207,8 @@ exports.approveRoleRequest = async (req, res) => {
 
     await teacher.save();
 
-    // Update request with assigned classes
-    roleRequest.requestedClasses = classes;
+    // Update request with assigned branches
+    roleRequest.requestedBranches = branches;
     roleRequest.status = 'approved';
     roleRequest.adminResponse = adminResponse || 'Your request has been approved';
     roleRequest.reviewedBy = req.user.id;
@@ -222,7 +222,7 @@ exports.approveRoleRequest = async (req, res) => {
       request: roleRequest,
       teacher: {
         id: teacher._id,
-        assignedClasses: teacher.assignedClasses,
+        assignedBranches: teacher.assignedBranches,
         assignedSubjects: teacher.assignedSubjects,
         semester: teacher.semester
       }

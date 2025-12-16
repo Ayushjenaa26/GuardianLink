@@ -13,7 +13,7 @@ function DataUpload({ embedded }) {
   const fileInputRef = useRef(null);
 
   // Expected columns for students and teachers
-  const studentColumns = ['Student Name', 'Roll No', 'Email', 'Class', 'Year', 'Batch', 'GPA', 'Status'];
+  const studentColumns = ['Student Name', 'Roll No', 'Email', 'Branch', 'Year', 'Batch', 'Semester', 'GPA', 'Status'];
   const teacherColumns = ['Teacher Name', 'Employee ID', 'Email', 'Subject', 'Phone', 'Department', 'Experience', 'Status'];
 
   const handleFileSelect = (e) => {
@@ -179,7 +179,7 @@ function DataUpload({ embedded }) {
   const downloadTemplate = () => {
     const columns = activeTab === 'students' ? studentColumns : teacherColumns;
     const sampleData = activeTab === 'students' 
-      ? [['John Doe', 'STU001', 'john@example.com', '10th', '2024', 'A', '3.8', 'Active']]
+      ? [['John Doe', 'STU001', 'john@example.com', 'CSE', '2024', 'A', '1', '3.8', 'Active']]
       : [['Jane Smith', 'TCH001', 'jane@example.com', 'Mathematics', '9876543210', 'Science', '5 Years', 'Active']];
 
     const ws = XLSX.utils.aoa_to_sheet([columns, ...sampleData]);

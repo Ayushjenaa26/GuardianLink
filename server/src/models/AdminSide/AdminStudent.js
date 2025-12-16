@@ -28,9 +28,9 @@ const adminStudentSchema = new mongoose.Schema({
       return this.rollNo;
     }
   },
-  class: {
+  branch: {
     type: String,
-    required: [true, 'Class is required'],
+    required: [true, 'Branch is required'],
     trim: true
   },
   year: {
@@ -41,6 +41,10 @@ const adminStudentSchema = new mongoose.Schema({
   batch: {
     type: String,
     required: [true, 'Batch is required'],
+    trim: true
+  },
+  semester: {
+    type: String,
     trim: true
   },
   attendance: {

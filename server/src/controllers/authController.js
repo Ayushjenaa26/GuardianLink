@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 
 // Import models
-const Teacher = require('../models/TeacherSide/Teacher');
-const Student = require('../models/Student');
+const AdminTeacher = require('../models/AdminSide/AdminTeacher');
+const AdminStudent = require('../models/AdminSide/AdminStudent');
 const Admin = require('../models/Admin');
 const Parent = require('../models/Parent');
 const AdminCode = require('../models/AdminCode');
@@ -21,32 +21,28 @@ exports.login = async (req, res) => {
             });
         }
 
-        const { email, password, role } = req.body;
+        const { email, password } = req.body;
 
-        // Determine which model to use based on role
-        let UserModel;
-        switch (role.toLowerCase()) {
-            case 'teacher':
-                UserModel = Teacher;
+        // Search for user across all models to auto-detect role
+        let user = null;
+        let role = null;
+        
+        const models = [
+            { model: Admin, role: 'admin' },
+            { model: AdminTeacher, role: 'teacher' },
+            { model: Parent, role: 'parent' },
+            { model: AdminStudent, role: 'student' }
+        ];
+        
+        for (const { model, role: modelRole } of models) {
+            const foundUser = await model.findOne({ email: email.toLowerCase() });
+            if (foundUser) {
+                user = foundUser;
+                role = modelRole;
                 break;
-            case 'parent':
-                UserModel = Parent;
-                break;
-            case 'student':
-                UserModel = Student;
-                break;
-            case 'admin':
-                UserModel = Admin;
-                break;
-            default:
-                return res.status(400).json({
-                    success: false,
-                    message: 'Invalid role specified'
-                });
+            }
         }
-
-        // Find user by email
-        const user = await UserModel.findOne({ email: email.toLowerCase() });
+        
         if (!user) {
             return res.status(401).json({
                 success: false,
@@ -117,10 +113,6 @@ exports.login = async (req, res) => {
             message: 'Server error during login',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
-        res.status(500).json({
-            success: false,
-            message: 'An error occurred during login'
-        });
     }
 };
 
@@ -187,12 +179,36 @@ exports.register = async (req, res) => {
             }
         }
 
+        // Validate teacher email against AdminTeacher database
+        if (role.toLowerCase() === 'teacher') {
+            const AdminTeacher = require('../models/AdminSide/AdminTeacher');
+            const teacherRecord = await AdminTeacher.findOne({ email: email.toLowerCase() });
+            
+            if (!teacherRecord) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This email is not registered as a teacher in the system. Please contact the administrator.'
+                });
+            }
+        }
+
         // Validate studentRollNo for parent registration
         if (role.toLowerCase() === 'parent') {
             if (!additionalFields.studentRollNo) {
                 return res.status(400).json({
                     success: false,
                     message: 'Student Roll Number is required'
+                });
+            }
+
+            // Check if roll number exists in AdminStudent database
+            const AdminStudent = require('../models/AdminSide/AdminStudent');
+            const studentRecord = await AdminStudent.findOne({ rollNo: additionalFields.studentRollNo.trim() });
+            
+            if (!studentRecord) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This Student Roll Number does not exist in the system. Please verify the roll number.'
                 });
             }
 
@@ -333,232 +349,6 @@ exports.createDemoTeacher = async () => {
         }
     } catch (error) {
         console.error('Error creating teacher accounts:', error);
-    }
-};
-
-exports.login = async (req, res) => {
-    try {
-        console.log('\n=== Login Request ===');
-        console.log('Headers:', req.headers);
-        console.log('URL:', req.originalUrl);
-        console.log('Body:', {
-            email: req.body.email,
-            role: req.body.role,
-            hasPassword: !!req.body.password
-        });
-
-        // Ensure request body is properly parsed
-        if (!req.is('application/json')) {
-            return res.status(400).json({
-                success: false,
-                message: 'Content-Type must be application/json'
-            });
-        }
-        
-        const { email, password, role } = req.body;
-        
-        console.log('Processing login for:', { email, role });
-        
-        if (!email || !password || !role) {
-            console.log('❌ Validation failed - missing fields');
-            return res.status(400).json({ 
-                success: false,
-                message: 'All fields are required',
-                details: {
-                    email: !email ? 'Email is required' : undefined,
-                    password: !password ? 'Password is required' : undefined,
-                    role: !role ? 'Role is required' : undefined
-                }
-            });
-        }
-
-        // Validate input
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            console.log('❌ Validation errors:', errors.array());
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-    let user;
-    let Model;
-    let payloadRole;
-    
-    console.log('🔍 Looking up user:', { email, role });
-        // Find user based on role
-        const normalizedRole = role.toLowerCase();
-        switch (normalizedRole) {
-            case 'teacher':
-                Model = Teacher;
-                break;
-            case 'student':
-                Model = Student;
-                break;
-            case 'admin':
-                Model = Admin;
-                break;
-            default:
-                console.log('❌ Invalid role:', role);
-                return res.status(400).json({ 
-                    success: false,
-                    message: 'Invalid role specified',
-                    validRoles: ['teacher', 'student', 'admin']
-                });
-        }
-        
-    // Normalize email for search
-    const normalizedEmail = email.toLowerCase().trim();
-    
-    // First try exact email match
-    user = await Model.findOne({ email: normalizedEmail });
-    console.log('DB lookup:', { 
-        role,
-        email: normalizedEmail,
-        collection: Model.collection.name,
-        found: !!user
-    });
-
-        // If still not found, attempt other role collections
-        if (!user) {
-            console.log('Trying fallback role lookup...');
-            const fallbackModels = [Teacher, Student, Admin];
-            for (const FModel of fallbackModels) {
-                // Try both exact and case-insensitive
-                const candidate = await FModel.findOne({
-                    $or: [
-                        { email: email },
-                        { email: { $regex: new RegExp('^' + email + '$', 'i') }}
-                    ]
-                });
-                if (candidate) {
-                    user = candidate;
-                    // detect role from model
-                    if (FModel === Teacher) payloadRole = 'teacher';
-                    else if (FModel === Student) payloadRole = 'student';
-                    else if (FModel === Admin) payloadRole = 'admin';
-                    console.log('Fallback found user in model, assigned role:', payloadRole);
-                    break;
-                }
-            }
-        }
-
-        if (!user) {
-            console.log('❌ User not found');
-            return res.status(401).json({ 
-                success: false,
-                message: 'Invalid email or password'
-            });
-        }
-
-        console.log('✅ Found user:', { 
-            id: user._id,
-            email: user.email,
-            role: user.role || role
-        });
-        
-        // Verify password
-        try {
-            console.log('🔑 Verifying password for user:', user.email);
-            console.log('🔑 Password hash exists:', !!user.password);
-            console.log('🔑 Password provided:', !!password);
-            
-            const isMatch = await bcrypt.compare(password, user.password);
-            
-            console.log('🔑 Password match result:', isMatch);
-            console.log('🔑 User object type:', user.constructor.name);
-            console.log('🔑 User password type:', typeof user.password);
-            console.log('🔑 Password provided type:', typeof password);
-            
-            if (!isMatch) {
-                console.log('❌ Password verification failed for:', user.email);
-                console.log('   Stored hash starts with:', user.password?.substring(0, 10));
-                console.log('   Provided password:', password?.substring(0, 5) + '...');
-                return res.status(401).json({ 
-                    success: false,
-                    message: 'Invalid email or password'
-                });
-            }
-            console.log('✅ Password verified successfully');
-        } catch (bcryptError) {
-            console.error('⚠️ Bcrypt error:', bcryptError);
-            console.error('⚠️ User password:', user.password);
-            console.error('⚠️ Is bcrypt hash:', user.password?.startsWith('$2'));
-            return res.status(500).json({
-                success: false,
-                message: 'Error verifying credentials'
-            });
-        }
-
-        // Create JWT payload
-        const payload = {
-            id: user._id.toString(),
-            email: user.email,
-            role: typeof payloadRole !== 'undefined' ? payloadRole : role,
-            name: user.name
-        };
-
-        // Log the payload we're about to sign
-        console.log('🔑 Creating token with payload:', { ...payload, id: '[REDACTED]' });
-
-        // Sign JWT
-        try {
-            const token = await new Promise((resolve, reject) => {
-                jwt.sign(
-                    payload,
-                    process.env.JWT_SECRET,
-                    { expiresIn: '24h' },
-                    (err, token) => {
-                        if (err) reject(err);
-                        else resolve(token);
-                    }
-                );
-            });
-
-            // Send successful response
-            const response = {
-                success: true,
-                message: 'Login successful',
-                token,
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    role: payload.role
-                }
-            };
-
-            console.log('✅ Login successful for:', user.email);
-            res.json(response);
-        } catch (tokenError) {
-            console.error('⚠️ Token creation failed:', tokenError);
-            res.status(500).json({
-                success: false,
-                message: 'Error creating authentication token'
-            });
-        }
-
-    } catch (error) {
-        console.error('Registration/Login error:', error);
-        let errorMessage = 'Server error occurred';
-        let statusCode = 500;
-
-        if (error.name === 'ValidationError') {
-            statusCode = 400;
-            errorMessage = 'Invalid data provided';
-        } else if (error.name === 'MongoError' || error.name === 'MongoServerError') {
-            if (error.code === 11000) {
-                statusCode = 409;
-                errorMessage = 'A user with this email already exists';
-            }
-        }
-
-        // Send detailed error in development, generic error in production
-        res.status(statusCode).json({ 
-            message: errorMessage,
-            error: process.env.NODE_ENV === 'development' ? {
-                details: error.message,
-                stack: error.stack
-            } : undefined
-        });
     }
 };
 
